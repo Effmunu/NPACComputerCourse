@@ -25,6 +25,15 @@ def print_msg(string=None):
     print "%s" % string
     return 0
 
+def read_msg():
+    """Read a message in the std input
+
+    :param
+    :return: input string
+    """
+
+    return raw_input("Enter sentence : ")
+
 # The following test is considered as a best practice: this way a module
 # can be used both as a standalone application or as a module called by another
 # module.
@@ -33,6 +42,17 @@ if __name__ == "__main__":
     # The main program is implement mainly as a function: this avoids having
     # all the variables used in this context (e.g. string in print_msg) to
     # become global variables.
-    status = print_msg()
+
+    msg_list = []
+    run=1
+    print "type 'exit' to quit"
+    while run:
+        msg=read_msg()
+        if msg=="exit":
+            run=0
+        else:
+            msg_list.append(msg)
+    for msg in msg_list:
+        status = print_msg(msg)
 
     sys.exit(status)
