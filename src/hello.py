@@ -44,12 +44,12 @@ if __name__ == "__main__":
     # become global variables.
 
     msg_list = []
-    run=1
+    run = 1
     print "type 'exit' to quit"
     while run:
-        msg=read_msg()
-        if msg=="exit":
-            run=0
+        msg = read_msg()
+        if msg == "exit":
+            run = 0
         else:
             msg_list.append(msg)
     for msg in msg_list:
