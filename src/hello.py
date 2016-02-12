@@ -25,15 +25,6 @@ def print_msg(string=None):
     print "%s" % string
     return 0
 
-def read_msg():
-    """Read a message in the std input
-
-    :param
-    :return: input string
-    """
-
-    return raw_input("Enter sentence : ")
-
 # The following test is considered as a best practice: this way a module
 # can be used both as a standalone application or as a module called by another
 # module.
@@ -47,7 +38,7 @@ if __name__ == "__main__":
     run = 1
     print "type 'exit' to quit"
     while run:
-        msg = read_msg()
+        msg = raw_input("Enter sentence : ")
         if msg == "exit":
             run = 0
         else:
