@@ -9,20 +9,28 @@ import sys
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
-if __name__ == '__main__':
+def main():
+    """
+    Reading and displaying a FITS file
+    """
+
     inputFilePath = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
+
     try:
-        data_blocks = fits.open(inputFilePath)
+        with fits.open(inputFilePath) as data_blocks:
+            data_blocks.info()
+
+            pixels = data_blocks[0].data
+
+            fig, pads = plt.subplots()
+            imgplot = pads.imshow(pixels)
+            plt.show()
+
+            return 0
 
     except IOError:
-#        pixels = None
         print "File not found :", inputFilePath
-        sys.exit(1)
+        return 1
 
-    data_blocks.info()
-    header, data = data_blocks[0], data_blocks[1]
-
-    print type(data)
-
-
-    sys.exit(0)
+if __name__ == '__main__':
+    sys.exit(main())
