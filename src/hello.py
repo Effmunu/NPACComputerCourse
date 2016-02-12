@@ -36,6 +36,7 @@ if __name__ == "__main__":
 
     msg_list = []
     run = 1
+    status = 0
     print "type 'exit' to quit"
     while run:
         msg = raw_input("Enter sentence : ")
