@@ -3,6 +3,8 @@
 
 """
 Reading and displaying a FITS file
+:Author: LAL npac09 <laudrain@ipno.in2p3.fr>
+:Date:   February 2016
 """
 
 import sys
