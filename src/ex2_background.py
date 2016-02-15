@@ -26,7 +26,7 @@ def main():
     Reading a FITS file and determining the background parameters.
     """
 
-    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
+    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex2.txt"
 
     # open file and retrieve data
@@ -78,13 +78,13 @@ def main():
 
 
     # write result to output file
-#    try:
-#        with open(output_file_path, 'w') as output_file:
-#            output_file.write('background: %d, dispersion: %d' % (int(background), int(dispersion)))
+    try:
+        with open(output_file_path, 'w') as output_file:
+            output_file.write('background: %d, dispersion: %d' % (int(background), int(dispersion)))
 
-#    except IOError:
-#        print "File not found :", output_file_path
-#        return 2
+    except IOError:
+        print "File not found :", output_file_path
+        return 2
 
     return 0
 
