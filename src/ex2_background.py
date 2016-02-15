@@ -12,7 +12,14 @@ import mylib
 import library
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy
 from astropy.io import fits
+
+def gaussian(x, max, mean, sigma):
+    """
+    compute a gaussian function:
+    """
+    return max * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
 
 def main():
     """
@@ -31,13 +38,15 @@ def main():
         print "File not found :", input_file_path
         return 1
 
-    # creating the histogram from the data
+    # creation of the histogram from the data
     bin_number = 200
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
 
-
+    # visualization of the histogram
     _, pads = plt.subplots()
     plt.plot(bin_boundaries[:-1], bin_values, 'b+:', label='data')
+    plt.plot(bin_boundaries[:-1], gaussian(bin_boundaries[:-1], 1630, 2800, 170), 'r.:', label='fit')
+
     plt.show()
 
 
