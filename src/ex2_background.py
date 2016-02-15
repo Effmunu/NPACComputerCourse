@@ -8,18 +8,16 @@ Reading a FITS file and determining the background parameters.
 """
 
 import sys
-import mylib
-import library
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from astropy.io import fits
 
-def gaussian(x, max, mean, sigma):
+def gaussian(x, amplitude, mean, sigma):
     """
     compute a gaussian function:
     """
-    return max * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
+    return amplitude * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
 
 def main():
     """
@@ -44,30 +42,34 @@ def main():
     bin_lower_boudaries = bin_boundaries[:-1]
 
     # normalize the distribution for the gaussian fit
-    my = np.float(np.max(bin_values))
-    normal_y = bin_values/my
-    mx = np.float(np.max(bin_boundaries))
-    normal_x = bin_lower_boudaries/mx
+    m_y = np.float(np.max(bin_values))
+    normal_y = bin_values/m_y
+    m_x = np.float(np.max(bin_boundaries))
+    normal_x = bin_lower_boudaries/m_x
 
     # apply the fit
-    fit, covariant = curve_fit(gaussian, normal_x, normal_y)
+    fit, _ = curve_fit(gaussian, normal_x, normal_y)
 
     # get back the un-normalized data
-    maxvalue = fit[0] * my
-    background = fit[1] * mx
-    dispersion = fit[2] * mx
+    maxvalue = fit[0] * m_y
+    background = fit[1] * m_x
+    dispersion = fit[2] * m_x
 
     # visualization of the histogram and the fit
-    _, pads = plt.subplots(1,3) # 1: image before bkg removal; 2: image after bkg removal; 3: histogram and fit
+    _, pads = plt.subplots(1, 3)
+        # 1: image before bkg removal; # 2: image after bkg removal; 3: histogram and fit
     pads[2].plot(bin_lower_boudaries, bin_values, 'b+:', label='data')
-    pads[2].plot(bin_lower_boudaries, gaussian(bin_lower_boudaries, maxvalue, background, dispersion), 'r.:', label='fit')
+    pads[2].plot(bin_lower_boudaries, \
+                 gaussian(bin_lower_boudaries, maxvalue, background, dispersion), \
+                 'r.:', label='fit')
     pads[2].legend()
     pads[2].set_title('Flux distribution')
     pads[2].set_xlabel('Amplitude')
     pads[2].set_ylabel('Frequency')
 
     # background removal
-    mask = pixels >= background + 5 * dispersion # 2D-array of booleans, 'True' if value is above background
+    mask = pixels >= background + 5 * dispersion
+        # 2D-array of booleans, 'True' if value is above bkg
     pixels_bkg_sub = mask * pixels
 
     # visualization of the image before and after bkg removal
