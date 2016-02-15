@@ -12,7 +12,7 @@ import mylib
 import library
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
+from scipy.optimize import curve_fit
 from astropy.io import fits
 
 def gaussian(x, max, mean, sigma):
@@ -41,12 +41,34 @@ def main():
     # creation of the histogram from the data
     bin_number = 200
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
+    bin_lower_boudaries = bin_boundaries[:-1]
+
+    # normalize the distribution for the gaussian fit
+    my = np.float(np.max(bin_values))
+    normal_y = bin_values/my
+    mx = np.float(np.max(bin_boundaries))
+    normal_x = bin_lower_boudaries/mx
+
+    # apply the fit
+    fit, covariant = curve_fit(gaussian, normal_x, normal_y)
+
+    # get back the un-normalized data
+    maxvalue = fit[0] * my
+    background = fit[1] * mx
+    dispersion = fit[2] * mx
+
+    print len(normal_x), len(normal_y), len(bin_values), len(bin_boundaries)
+
+
 
     # visualization of the histogram
     _, pads = plt.subplots()
-    plt.plot(bin_boundaries[:-1], bin_values, 'b+:', label='data')
-    plt.plot(bin_boundaries[:-1], gaussian(bin_boundaries[:-1], 1630, 2800, 170), 'r.:', label='fit')
-
+    plt.plot(bin_lower_boudaries, bin_values, 'b+:', label='data')
+    plt.plot(bin_lower_boudaries, gaussian(bin_lower_boudaries, maxvalue, background, dispersion), 'r.:', label='fit')
+    pads.legend()
+    pads.set_title('Flux distribution')
+    pads.set_xlabel('Amplitude')
+    pads.set_ylabel('Frequency')
     plt.show()
 
 
