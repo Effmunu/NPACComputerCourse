@@ -16,35 +16,39 @@ def main():
     Reading and displaying a FITS file
     """
 
-    inputFilePath = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
-    outputFilePath = "/Users/npac09/PycharmProjects/npac09/src/ex1.txt"
+    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
+    output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex1.txt"
 
 
+    # open file and retrieve data
     try:
-        with fits.open(inputFilePath) as data_blocks:
+        with fits.open(input_file_path) as data_blocks:
             data_blocks.info()
-
             pixels = data_blocks[0].data
 
-            _, pads = plt.subplots()
-            pads.imshow(pixels)
-            plt.show()
-
     except IOError:
-        print "File not found :", inputFilePath
+        print "File not found :", input_file_path
         return 1
 
+
+    # plot
+    _, pads = plt.subplots()
+    pads.imshow(pixels)
+    plt.show()
+
+    # write result to output file
     try:
-        with open(outputFilePath, 'w') as outputFile:
+        with open(output_file_path, 'w') as output_file:
             header = data_blocks[0].header
-            outputFile.write('cd1_1: %.10f, cd1_2: %.10f, cd2_1: %.10f, cd2_2: %.10f' \
+            output_file.write('cd1_1: %.10f, cd1_2: %.10f, cd2_1: %.10f, cd2_2: %.10f' \
                      % (header['CD1_1'], header['CD1_2'], header['CD2_1'], header['CD2_2']))
 
     except IOError:
-        print "File not found :", outputFilePath
+        print "File not found :", output_file_path
         return 2
 
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
