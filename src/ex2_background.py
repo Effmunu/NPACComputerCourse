@@ -10,9 +10,8 @@ Reading a FITS file and determining the background parameters.
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
 from astropy.io import fits
-from mylib import gaussian
+import mylib
 
 
 def main():
@@ -35,16 +34,10 @@ def main():
     # creation of the histogram from the data
     bin_number = 200
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
-    bin_lower_boudaries = bin_boundaries[:-1]
-
-    # normalize the distribution for the gaussian fit
-    m_y = np.float(np.max(bin_values))
-    normal_y = bin_values/m_y
-    m_x = np.float(np.max(bin_boundaries))
-    normal_x = bin_lower_boudaries/m_x
+    bin_lower_boundaries = bin_boundaries[:-1]
 
     # apply the fit
-    fit, _ = curve_fit(gaussian, normal_x, normal_y)
+    fit, _, m_x, m_y = mylib.fit(mylib.gaussian, bin_lower_boundaries, bin_values)
 
     # get back the un-normalized data
     maxvalue = fit[0] * m_y
@@ -54,9 +47,9 @@ def main():
     # visualization of the histogram and the fit
     _, pads = plt.subplots(1, 3)
         # 1: image before bkg removal; # 2: image after bkg removal; 3: histogram and fit
-    pads[2].plot(bin_lower_boudaries, bin_values, 'b+:', label='data')
-    pads[2].plot(bin_lower_boudaries, \
-                 gaussian(bin_lower_boudaries, maxvalue, background, dispersion), \
+    pads[2].plot(bin_lower_boundaries, bin_values, 'b+:', label='data')
+    pads[2].plot(bin_lower_boundaries, \
+                 mylib.gaussian(bin_lower_boundaries, maxvalue, background, dispersion), \
                  'r.:', label='fit')
     pads[2].legend()
     pads[2].set_title('Flux distribution')

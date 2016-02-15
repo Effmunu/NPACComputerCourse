@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Personal functions
+"""
 
-import library
 from astropy.io import fits
+from scipy.optimize import curve_fit
 import numpy as np
+import library
 
 def gaussian(x, amplitude, mean, sigma):
     """
@@ -11,6 +15,26 @@ def gaussian(x, amplitude, mean, sigma):
     """
     return amplitude * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
 
+def fit(fitting_function, xdata, ydata):
+    """
+    Fit a set of data with a function f.
+    :param f: fitting function
+    :param xdata: bin boundaries values
+    :param ydata: bin contents (values)
+    :return:    The fit parameters array 'fit_param',
+                the covariant matrix 'covariant',
+                and the normalization parameters 'm_x' and 'm_y'.
+    """
+
+    m_x = np.float(np.max(xdata))
+    m_y = np.float(np.max(ydata))
+
+    # apply the fit, we normalize the data to help the fitting program
+    fit_param, covariant = curve_fit(fitting_function, \
+                       xdata / m_x, \
+                       ydata / m_y)
+
+    return fit_param, covariant, m_x, m_y
 
 
 
