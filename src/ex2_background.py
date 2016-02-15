@@ -57,20 +57,24 @@ def main():
     background = fit[1] * mx
     dispersion = fit[2] * mx
 
-    print len(normal_x), len(normal_y), len(bin_values), len(bin_boundaries)
+    # visualization of the histogram and the fit
+    _, pads = plt.subplots(1,3) # 1: image before bkg removal; 2: image after bkg removal; 3: histogram and fit
+    pads[2].plot(bin_lower_boudaries, bin_values, 'b+:', label='data')
+    pads[2].plot(bin_lower_boudaries, gaussian(bin_lower_boudaries, maxvalue, background, dispersion), 'r.:', label='fit')
+    pads[2].legend()
+    pads[2].set_title('Flux distribution')
+    pads[2].set_xlabel('Amplitude')
+    pads[2].set_ylabel('Frequency')
 
+    # background removal
+    mask = pixels >= background + 5 * dispersion # 2D-array of booleans, 'True' if value is above background
+    pixels_bkg_sub = mask * pixels
 
+    # visualization of the image before and after bkg removal
+    pads[0].imshow(pixels)
+    pads[1].imshow(pixels_bkg_sub)
 
-    # visualization of the histogram
-    _, pads = plt.subplots()
-    plt.plot(bin_lower_boudaries, bin_values, 'b+:', label='data')
-    plt.plot(bin_lower_boudaries, gaussian(bin_lower_boudaries, maxvalue, background, dispersion), 'r.:', label='fit')
-    pads.legend()
-    pads.set_title('Flux distribution')
-    pads.set_xlabel('Amplitude')
-    pads.set_ylabel('Frequency')
     plt.show()
-
 
 
     # write result to output file
