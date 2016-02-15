@@ -10,8 +10,9 @@ Reading a FITS file and determining the background parameters.
 import sys
 import mylib
 import library
-from astropy.io import fits
 import numpy as np
+import matplotlib.pyplot as plt
+from astropy.io import fits
 
 def main():
     """
@@ -33,7 +34,13 @@ def main():
     # creating the histogram from the data
     bin_number = 200
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
-    print bin_values, bin_boundaries
+
+
+    _, pads = plt.subplots()
+    plt.plot(bin_boundaries[:-1], bin_values, 'b+:', label='data')
+    plt.show()
+
+
 
     # write result to output file
 #    try:
