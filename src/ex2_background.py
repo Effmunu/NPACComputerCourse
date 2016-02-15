@@ -12,12 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from astropy.io import fits
+from mylib import gaussian
 
-def gaussian(x, amplitude, mean, sigma):
-    """
-    compute a gaussian function:
-    """
-    return amplitude * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
 
 def main():
     """

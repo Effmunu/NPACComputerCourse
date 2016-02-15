@@ -3,6 +3,16 @@
 
 import library
 from astropy.io import fits
+import numpy as np
+
+def gaussian(x, amplitude, mean, sigma):
+    """
+    compute a gaussian function:
+    """
+    return amplitude * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
+
+
+
 
 if __name__ == '__main__':
 
