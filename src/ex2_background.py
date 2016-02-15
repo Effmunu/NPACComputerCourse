@@ -11,6 +11,7 @@ import sys
 import mylib
 import library
 from astropy.io import fits
+import numpy as np
 
 def main():
     """
@@ -20,20 +21,19 @@ def main():
     input_file_path = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex2.txt"
 
-
-
     # open file and retrieve data
     try:
         with fits.open(input_file_path) as data_blocks:
-            data_blocks.info()
             pixels = data_blocks[0].data
-            print type(pixels)
 
     except IOError:
         print "File not found :", input_file_path
         return 1
 
-
+    # creating the histogram from the data
+    bin_number = 200
+    bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
+    print bin_values, bin_boundaries
 
     # write result to output file
 #    try:
