@@ -57,9 +57,9 @@ def main():
     pads[2].set_ylabel('Frequency')
 
     # background removal
-    mask = pixels >= background + 5 * dispersion
+    mask = pixels >= background + 6.0 * dispersion
         # 2D-array of booleans, 'True' if value is above bkg
-    pixels_bkg_sub = mask * pixels
+    pixels_bkg_sub = mask * (pixels - background)
 
     # visualization of the image before and after bkg removal
     pads[0].imshow(pixels)
