@@ -9,6 +9,9 @@ from scipy.optimize import curve_fit
 import numpy as np
 import library
 
+##########
+### For exercice 2
+##########
 def gaussian(x, amplitude, mean, sigma):
     """
     compute a gaussian function:
@@ -36,6 +39,34 @@ def fit(fitting_function, xdata, ydata):
 
     return fit_param, covariant, m_x, m_y
 
+##########
+### For exercice 3
+##########
+def find_cluster(pixels_visited, pixels, x, y, threshold):
+    """
+    The image is assumed to be a matrix
+    with first coordinate going from top to bottom
+    and second coordinate going from right to left
+    The 'cluster' argument should always be [] at first step
+
+    :return: the list of pixels in the cluster
+    """
+
+    pixels_visited[x, y] = 1  # this pixel has been tested
+    # boundary conditions
+    if x < 0 or x >= len(pixels) \
+            or y < 0 or y >= len(pixels[0]):
+        return []
+    # if already tested
+    elif pixels_visited[x, y]:
+        return []
+    elif pixels[x, y] < threshold:
+        return []
+    else:
+        return [x, y].append(find_cluster(pixels_visited, pixels, x, y+1, threshold), \
+                            find_cluster(pixels_visited, pixels, x-1, y, threshold), \
+                            find_cluster(pixels_visited, pixels, x, y-1, threshold), \
+                            find_cluster(pixels_visited, pixels, x+1, y, threshold))
 
 
 if __name__ == '__main__':
