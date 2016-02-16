@@ -52,7 +52,6 @@ def find_cluster(pixels_visited, pixels, x, y, threshold):
     :return: the list of pixels in the cluster
     """
 
-    pixels_visited[x, y] = 1  # this pixel has been tested
     # boundary conditions
     if x < 0 or x >= len(pixels) \
             or y < 0 or y >= len(pixels[0]):
@@ -61,12 +60,14 @@ def find_cluster(pixels_visited, pixels, x, y, threshold):
     elif pixels_visited[x, y]:
         return []
     elif pixels[x, y] < threshold:
+        pixels_visited[x, y] = 1  # this pixel has been tested
         return []
     else:
-        return [x, y].append(find_cluster(pixels_visited, pixels, x, y+1, threshold), \
-                            find_cluster(pixels_visited, pixels, x-1, y, threshold), \
-                            find_cluster(pixels_visited, pixels, x, y-1, threshold), \
-                            find_cluster(pixels_visited, pixels, x+1, y, threshold))
+        pixels_visited[x, y] = 1  # this pixel has been tested
+        return [(x,y)] + find_cluster(pixels_visited, pixels, x, y+1, threshold) + \
+               find_cluster(pixels_visited, pixels, x-1, y, threshold) + \
+               find_cluster(pixels_visited, pixels, x, y-1, threshold) + \
+               find_cluster(pixels_visited, pixels, x+1, y, threshold)
 
 
 if __name__ == '__main__':
