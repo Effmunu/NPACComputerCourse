@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Reads a FITS image
-Finding the clusters of pixels above a threshold in an FITS image
+Finding the clusters of pixels above a threshold in an FITS image, after background removal.
 :Author: LAL npac09 <laudrain@ipno.in2p3.fr>
 :Date:   February 2016
 """
