@@ -47,8 +47,12 @@ def find_cluster(pixels_visited, pixels, x, y, threshold):
     The image is assumed to be a matrix
     with first coordinate going from top to bottom
     and second coordinate going from right to left
-    The 'cluster' argument should always be [] at first step
 
+    :param pixels_visited: boolean matrix of visited pixels (1 = visited)
+    :param pixels: original image matrix
+    :param x: x coordinate of the seed to begin the search
+    :param y: y coordinate of the seed to begin the search
+    :param threshold: detection threshold, usually "mean + 6*sigma"
     :return: the list of pixels in the cluster
     """
 
@@ -64,7 +68,7 @@ def find_cluster(pixels_visited, pixels, x, y, threshold):
         return []
     else:
         pixels_visited[x, y] = 1  # this pixel has been tested
-        return [(x,y)] + find_cluster(pixels_visited, pixels, x, y+1, threshold) + \
+        return [(x, y)] + find_cluster(pixels_visited, pixels, x, y+1, threshold) + \
                find_cluster(pixels_visited, pixels, x-1, y, threshold) + \
                find_cluster(pixels_visited, pixels, x, y-1, threshold) + \
                find_cluster(pixels_visited, pixels, x+1, y, threshold)

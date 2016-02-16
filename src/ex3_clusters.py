@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-
+Reads a FITS image
+Finding the clusters of pixels above a threshold in an FITS image
+:Author: LAL npac09 <laudrain@ipno.in2p3.fr>
+:Date:   February 2016
 """
 
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 from astropy.io import fits
 import Cluster
 import mylib
@@ -16,7 +18,7 @@ def main():
     Reading a FITS file and finding the clusters in the image, after background removal.
     """
 
-    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
+    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex3.txt"
 
     # open file and retrieve data
@@ -34,10 +36,10 @@ def main():
     bin_lower_boundaries = bin_boundaries[:-1]
 
     # apply the fit
-    fit, _, m_x, m_y = mylib.fit(mylib.gaussian, bin_lower_boundaries, bin_values)
+    fit, _, m_x, _ = mylib.fit(mylib.gaussian, bin_lower_boundaries, bin_values)
 
     # get back the un-normalized data
-    maxvalue = fit[0] * m_y
+#    maxvalue = fit[0] * m_y
     background = fit[1] * m_x
     dispersion = fit[2] * m_x
 
@@ -66,10 +68,10 @@ def main():
     # create the dictionnary of clusters
     # in the same time, find the maximum integral
     max_integral = 0
-    for i in range(len(clusters_list)):
-        if clusters_list[i].integral > max_integral:
-            max_integral = clusters_list[i].integral
-        clusters_dico['%f %f' % clusters_list[i].centroid] = clusters_list[i]
+    for cluster in clusters_list:
+        if cluster.integral > max_integral:
+            max_integral = cluster.integral
+        clusters_dico['%f %f' % cluster.centroid] = cluster
 
     # write result to output file
     try:
