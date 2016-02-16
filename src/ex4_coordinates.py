@@ -1,12 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+Reading a FITS file, finding the clusters
+ and converting their centroid coordinates to WCS coordinates.
+:Author: LAL npac09 <laudrain@ipno.in2p3.fr>
+:Date:   February 2016
+"""
+
 import sys
 import numpy as np
 from astropy.io import fits
+import matplotlib.pyplot as plt
 import library
 import Cluster
 import mylib
+
+def move(event):
+    """
+
+    :param event:
+    :return:
+    """
 
 
 def main():
@@ -61,29 +76,32 @@ def main():
                 cluster = Cluster.Cluster(pixels_in_cluster, pixels)
                 clusters_list.append(cluster)
                 pixels_visited[row, col] = 1 # visited
-
+    print 'test'
+    # create a WCS object
+    my_wcs = library.WCS(header)
+    print 'test'
     # create the dictionnary of clusters
     # in the same time, find the maximum integral
-    max_integral = 0
+    max_value = 0
+
     for cluster in clusters_list:
-        if cluster.integral > max_integral:
-            max_integral = cluster.integral
-        clusters_dico['%f %f' % cluster.centroid] = cluster
-
-    my_wcs = library.WCS(header)
-
-
-
-
+        key = '%f %f' % cluster.centroid
+        clusters_dico[key] = cluster
+        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], cluster.centroid[1])
+        if cluster.centroid_value > max_value:
+            max_value = cluster.centroid_value
+            max_value_key = key
+        print cluster.centroid_wcs # No cluster with the right coordinates !!!
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('right ascension: %.10f, declination: %.10f' % (g_ra, g_dec))
+            output_file.write('right ascension: %.10f, declination: %.10f' \
+                              % (clusters_dico[max_value_key].centroid_wcs))
 
     except IOError:
         print "File not found :", output_file_path
         return 2
-
+    print 'test'
     return 0
 
 if __name__ == '__main__':

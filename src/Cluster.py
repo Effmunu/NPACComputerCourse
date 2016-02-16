@@ -9,7 +9,7 @@ class Cluster:
     """
     This class is used to gather basic information on a cluster found :
     :attribute pixel_list: the list of pixels (doublet of integers)
-    :attribute centroid: the position of the centroid (doublet of integer)
+    :attribute centroid: the position of the centroid (doublet of floats)
     :attribute centroid_value: the pixel value at of the centroid pixel (float)
     :attribute integral: total luminosity of the cluster
     """
@@ -21,7 +21,7 @@ class Cluster:
         :param pixels: original image to look in
         """
         self.pixel_list = []
-        self.centroid = (0, 0)
+        self.centroid = (0., 0.)
         self.centroid_value = 0.
         self.integral = 0.
 
