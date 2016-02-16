@@ -8,15 +8,8 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
+import Cluster
 import mylib
-
-
-class Cluster:
-    """
-
-    """
-    def __init__(self):
-
 
 def main():
     """
@@ -48,26 +41,41 @@ def main():
     background = fit[1] * m_x
     dispersion = fit[2] * m_x
 
-    #
+    # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
+    # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
+    # List and dictionary of clusters:
+    clusters_list = []
+    clusters_dico = {}
 
+    # find the clusters
     for row in range(len(pixels)):
         for col in range(len(pixels[0])):
-            pixels_visited[row, col] = 1    # pixel visited
-            # On en est à là : is it below the threshold? (a value is considered if greater or equal to threshold)
+            if pixels_visited[row, col]:
+                continue # If pixel visited, g to next pixel (next step of the loop)
+            if pixels[row, col] < threshold:
+                pixels_visited[row, col] = 1 # visited
+            else: # add the new cluster to the list
+                pixels_in_cluster = mylib.find_cluster(pixels_visited, pixels, row, col, threshold)
+                cluster = Cluster.Cluster(pixels_in_cluster, pixels)
+                clusters_list.append(cluster)
+                pixels_visited[row, col] = 1 # visited
 
-    cluster = Cluster()
-
-
-
+    # create the dictionnary of clusters
+    # in the same time, find the maximum integral
+    max_integral = 0
+    for i in range(len(clusters_list)):
+        if clusters_list[i].integral > max_integral:
+            max_integral = clusters_list[i].integral
+        clusters_dico['%f %f' % clusters_list[i].centroid] = clusters_list[i]
 
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
             output_file.write('number of clusters: %d, greatest integral: %d' \
-                              % (len(reg.clusters), max_integral))
+                              % (len(clusters_list), max_integral))
 
     except IOError:
         print "File not found :", output_file_path
