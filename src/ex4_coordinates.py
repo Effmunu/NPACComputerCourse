@@ -58,50 +58,69 @@ def main():
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
-    # We define an array of pixels visited: 1 if visited, 0 elsewise
-    pixels_visited = np.zeros_like(pixels)
-    # List and dictionary of clusters:
-    clusters_list = []
+    # find the clusters.
+    clusters_list = mylib.find_clusters(pixels, threshold)
     clusters_dico = {}
 
-    # find the clusters
-    for row in range(len(pixels)):
-        for col in range(len(pixels[0])):
-            if pixels_visited[row, col]:
-                continue # If pixel visited, g to next pixel (next step of the loop)
-            if pixels[row, col] < threshold:
-                pixels_visited[row, col] = 1 # visited
-            else: # add the new cluster to the list
-                pixels_in_cluster = mylib.find_cluster(pixels_visited, pixels, row, col, threshold)
-                cluster = Cluster.Cluster(pixels_in_cluster, pixels)
-                clusters_list.append(cluster)
-                pixels_visited[row, col] = 1 # visited
     print 'test'
     # create a WCS object
     my_wcs = library.WCS(header)
     print 'test'
-    # create the dictionnary of clusters
-    # in the same time, find the maximum integral
-    max_value = 0
 
+    # plot
+    _, pads = plt.subplots()
+
+    # background removal on the image
+    mask = pixels >= background + threshold
+        # 2D-array of booleans, 'True' if value is above bkg
+    pixels_bkg_sub = mask * (pixels - background)
+    # visualization of the image before and after bkg removal
+    pads.imshow(pixels_bkg_sub)
+
+    # Display the corners coordinates
+    pads.text(0, 0, '%f %f' % my_wcs.convert_to_radec(0, 0), \
+              color = 'white', fontsize = 14)
+    pads.text(0, len(pixels), '%f %f' % my_wcs.convert_to_radec(0, len(pixels)), \
+              color = 'white', fontsize = 14)
+    pads.text(len(pixels[0]), 0, '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), 0), \
+              color = 'white', fontsize = 14)
+    pads.text(len(pixels[0]), len(pixels), '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), len(pixels)), \
+              color = 'white', fontsize = 14)
+
+    # create the dictionnary of clusters
+    # in the same time, find the maximum integral luminosity cluster
+    max_integral = 0
     for cluster in clusters_list:
         key = '%f %f' % cluster.centroid
         clusters_dico[key] = cluster
-        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], cluster.centroid[1])
-        if cluster.centroid_value > max_value:
-            max_value = cluster.centroid_value
-            max_value_key = key
-        print cluster.centroid_wcs # No cluster with the right coordinates !!!
+        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], cluster.centroid[1]) # local attribute
+        pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
+                  color = 'white', fontsize = 14) # display centroid coordinates
+        if cluster.integral > max_integral:
+            max_integral = cluster.integral
+            max_integral_key = key
+#        print cluster.centroid_wcs, cluster.centroid_value, max_integral, max_integral_key
+#    for pix in clusters_dico[max_integral_key].pixel_list:
+#        print pixels[pix[0], pix[1]], pix
+    print my_wcs.convert_to_radec(59., 51.)
+    print my_wcs.convert_to_radec(59., 52.)
+    print my_wcs.convert_to_radec(54., 51.)
+    print my_wcs.convert_to_xy(149.3385366873, 69.3036478559)
+    # display
+    plt.show()
+
+
+
+
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
             output_file.write('right ascension: %.10f, declination: %.10f' \
-                              % (clusters_dico[max_value_key].centroid_wcs))
+                              % (clusters_dico[max_integral_key].centroid_wcs))
 
     except IOError:
         print "File not found :", output_file_path
         return 2
-    print 'test'
     return 0
 
 if __name__ == '__main__':
