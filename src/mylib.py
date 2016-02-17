@@ -69,10 +69,10 @@ def explore_cluster(pixels_visited, pixels, x, y, threshold):
         return []
     else:
         pixels_visited[x, y] = 1  # this pixel has been tested
-        return [(x, y)] + explore_cluster(pixels_visited, pixels, x+1, y, threshold) + \
+        return [(x, y)] + explore_cluster(pixels_visited, pixels, x, y-1, threshold) + \
+               explore_cluster(pixels_visited, pixels, x+1, y, threshold) + \
                explore_cluster(pixels_visited, pixels, x, y+1, threshold) + \
-               explore_cluster(pixels_visited, pixels, x-1, y, threshold) + \
-               explore_cluster(pixels_visited, pixels, x, y-1, threshold) # right, top, left, bottom
+               explore_cluster(pixels_visited, pixels, x-1, y, threshold) # right, top, left, bottom
 
 def find_clusters(pixels, threshold):
     # We define an array of pixels visited: 1 if visited, 0 elsewise

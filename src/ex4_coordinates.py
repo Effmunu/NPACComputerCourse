@@ -29,7 +29,7 @@ def main():
 
     """
 
-    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
+    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex4.txt"
 
     # open file and retrieve data and header
@@ -99,9 +99,9 @@ def main():
         if cluster.integral > max_integral:
             max_integral = cluster.integral
             max_integral_key = key
-#        print cluster.centroid_wcs, cluster.centroid_value, max_integral, max_integral_key
-#    for pix in clusters_dico[max_integral_key].pixel_list:
-#        print pixels[pix[0], pix[1]], pix
+        print cluster.centroid_wcs, cluster.centroid_value, max_integral, max_integral_key
+    for pix in clusters_dico[max_integral_key].pixel_list:
+        print pixels[pix[0], pix[1]], pix
     print my_wcs.convert_to_radec(59., 51.)
     print my_wcs.convert_to_radec(59., 52.)
     print my_wcs.convert_to_radec(54., 51.)
