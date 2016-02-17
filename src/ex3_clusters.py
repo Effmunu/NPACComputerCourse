@@ -48,22 +48,9 @@ def main():
 
     # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
-    # List and dictionary of clusters:
-    clusters_list = []
+    # find the clusters.
+    clusters_list = mylib.find_clusters(pixels, threshold)
     clusters_dico = {}
-
-    # find the clusters
-    for row in range(len(pixels)):
-        for col in range(len(pixels[0])):
-            if pixels_visited[row, col]:
-                continue # If pixel visited, g to next pixel (next step of the loop)
-            if pixels[row, col] < threshold:
-                pixels_visited[row, col] = 1 # visited
-            else: # add the new cluster to the list
-                pixels_in_cluster = mylib.find_cluster(pixels_visited, pixels, row, col, threshold)
-                cluster = Cluster.Cluster(pixels_in_cluster, pixels)
-                clusters_list.append(cluster)
-                pixels_visited[row, col] = 1 # visited
 
     # create the dictionnary of clusters
     # in the same time, find the maximum integral

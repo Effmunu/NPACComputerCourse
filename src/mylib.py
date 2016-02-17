@@ -8,6 +8,7 @@ from astropy.io import fits
 from scipy.optimize import curve_fit
 import numpy as np
 import library
+import Cluster
 
 ##########
 ### For exercice 2
@@ -42,7 +43,7 @@ def fit(fitting_function, xdata, ydata):
 ##########
 ### For exercice 3
 ##########
-def find_cluster(pixels_visited, pixels, x, y, threshold):
+def explore_cluster(pixels_visited, pixels, x, y, threshold):
     """
     The image is assumed to be a matrix
     with first coordinate going from top to bottom
@@ -68,11 +69,30 @@ def find_cluster(pixels_visited, pixels, x, y, threshold):
         return []
     else:
         pixels_visited[x, y] = 1  # this pixel has been tested
-        return [(x, y)] + find_cluster(pixels_visited, pixels, x, y+1, threshold) + \
-               find_cluster(pixels_visited, pixels, x-1, y, threshold) + \
-               find_cluster(pixels_visited, pixels, x, y-1, threshold) + \
-               find_cluster(pixels_visited, pixels, x+1, y, threshold)
+        return [(x, y)] + explore_cluster(pixels_visited, pixels, x+1, y, threshold) + \
+               explore_cluster(pixels_visited, pixels, x, y+1, threshold) + \
+               explore_cluster(pixels_visited, pixels, x-1, y, threshold) + \
+               explore_cluster(pixels_visited, pixels, x, y-1, threshold) # right, top, left, bottom
 
+def find_clusters(pixels, threshold):
+    # We define an array of pixels visited: 1 if visited, 0 elsewise
+    pixels_visited = np.zeros_like(pixels)
+    clusters_list = []
+
+    # WARNING : the components of pixels correspond to (x,y) as follows : pixels[x, y]
+    for x in range(len(pixels)):
+        for y in range(len(pixels[0])):
+            if pixels_visited[x, y]:
+                continue # If pixel visited, go to next pixel (next step of the loop)
+            if pixels[x, y] < threshold:
+                pixels_visited[x, y] = 1 # visited
+            else: # add the new cluster to the list
+                cluster = Cluster.Cluster(explore_cluster(
+                    pixels_visited, pixels, x, y, threshold), pixels)
+                clusters_list.append(cluster)
+                pixels_visited[x, y] = 1 # visited
+
+    return clusters_list
 
 if __name__ == '__main__':
 

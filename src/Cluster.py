@@ -21,13 +21,13 @@ class Cluster:
         :param pixels: original image to look in
         """
         self.pixel_list = []
-        self.centroid = (0., 0.)
-        self.centroid_value = 0.
+        self.centroid = (-1., -1.)
+        self.centroid_value = -1.
         self.integral = 0.
 
-        for (i, j) in pixel_list:
-            self.pixel_list.append((i, j))  # deep copy of the input pixel list in the object pixel list
-            self.integral += pixels[i, j]   # compute the integral of the cluster
-            if pixels[i, j] > self.centroid_value:  # find the centroid and its value (max pixel value)
-                self.centroid = (i, j)
-                self.centroid_value = pixels[i, j]
+        for (x, y) in pixel_list:
+            self.pixel_list.append((x, y))  # deep copy of the input pixel list in the object pixel list
+            self.integral += pixels[x, y]   # compute the integral of the cluster
+            if pixels[x, y] > self.centroid_value:  # find the centroid and its value (max pixel value)
+                self.centroid = (x, y)
+                self.centroid_value = pixels[x, y]
