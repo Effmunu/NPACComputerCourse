@@ -18,32 +18,6 @@ import mylib
 # 'numpy' has indeed an 'histogram' member, this error is not relevant
 
 
-def event_handler(fig, my_wcs, pixels):
-    """
-    Event handler
-    :param fig: the canvas to draw into
-    :param my_wcs: The conversion tool for coordinates
-    :param pixels: The image to display
-    :return:
-    """
-    def move(event):
-        """
-        Action on mouse movement
-        :param event: the event
-        :return:
-        """
-        if event.xdata >= len(pixels) or event.xdata < 0 \
-                or event.ydata >= len(pixels) or event.ydata < 0:
-            return
-        pads = event.inaxes     #event.inaxes renvoie le pad courant
-        text_id = pads.text(event.xdata, event.ydata,
-                            "%f, %f" % my_wcs.convert_to_radec(event.xdata, event.ydata),
-                            fontsize=14, color='white')
-        event.canvas.draw()
-        text_id.remove()
-
-    fig.canvas.mpl_connect('motion_notify_event', move)
-
 def main():
     """
     Reading a FITS file, finding the clusters,
@@ -118,7 +92,7 @@ def main():
             max_integral = cluster.integral
             max_integral_key = key
 
-    event_handler(fig, my_wcs, pixels)
+    mylib.event_handler(fig, my_wcs, pixels)
     # display
     plt.show()
 
