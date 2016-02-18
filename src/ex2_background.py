@@ -12,6 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mylib
 
+# pylint: disable=E1101
+# 'numpy' has indeed an 'histogram' member, this error is not relevant
 
 def main():
     """
