@@ -31,11 +31,11 @@ def main():
     and converting their centroid coordinates to WCS coordinates.
     """
 
-    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
+    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex4.txt"
 
     # open file and retrieve data and header
-    _, pixels = mylib.open_fits(input_file_path)
+    header, pixels = mylib.open_fits(input_file_path)
 
     # creation of the histogram from the data
     bin_number = 200
@@ -57,10 +57,8 @@ def main():
     clusters_list = mylib.find_clusters(pixels, threshold)
     clusters_dico = {}
 
-    print 'test'
     # create a WCS object
     my_wcs = library.WCS(header)
-    print 'test'
 
     # plot
     _, pads = plt.subplots()
@@ -94,13 +92,9 @@ def main():
         if cluster.integral > max_integral:
             max_integral = cluster.integral
             max_integral_key = key
-        print cluster.centroid_wcs, cluster.centroid_value, max_integral, max_integral_key
-    for pix in clusters_dico[max_integral_key].pixel_list:
-        print pixels[pix[0], pix[1]], pix
-    print my_wcs.convert_to_radec(59., 51.)
-    print my_wcs.convert_to_radec(59., 52.)
-    print my_wcs.convert_to_radec(54., 51.)
-    print my_wcs.convert_to_xy(149.3385366873, 69.3036478559)
+        print cluster.centroid_wcs, max_integral, max_integral_key
+    print clusters_dico[max_integral_key].centroid
+
     # display
     plt.show()
 
