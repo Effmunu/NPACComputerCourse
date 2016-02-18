@@ -56,7 +56,6 @@ def main():
             max_integral_key = '%f %f' % cluster.centroid
         clusters_dico['%f %f' % cluster.centroid] = cluster
 
-    print clusters_dico[max_integral_key].box_ymax, clusters_dico[max_integral_key].box_ymin
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
