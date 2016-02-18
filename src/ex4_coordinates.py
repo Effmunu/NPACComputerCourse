@@ -17,13 +17,22 @@ import mylib
 # pylint: disable=E1101
 # 'numpy' has indeed an 'histogram' member, this error is not relevant
 
-def move(event):
-    """
 
-    :param event:
-    :return:
-    """
+def event_handler(fig, my_wcs):
+    def move(event):
+        """
 
+        :param event: the event
+        :return:
+        """
+        pads = event.inaxes     #event.inaxes renvoie le pad courant
+        text_id = pads.text(event.xdata, event.ydata,
+            "%f, %f" % my_wcs.convert_to_radec(event.xdata, event.ydata),
+            fontsize=14, color='white')
+        event.canvas.draw()
+        text_id.remove()
+
+    fig.canvas.mpl_connect('motion_notify_event', move)
 
 def main():
     """
@@ -61,7 +70,7 @@ def main():
     my_wcs = library.WCS(header)
 
     # plot
-    _, pads = plt.subplots()
+    fig, pads = plt.subplots()
 
     # background removal on the image
     mask = pixels >= background + threshold
@@ -71,30 +80,30 @@ def main():
     pads.imshow(pixels_bkg_sub)
 
     # Display the corners coordinates
-    pads.text(0, 0, '%f %f' % my_wcs.convert_to_radec(0, 0), \
-              color='white', fontsize=14)
-    pads.text(0, len(pixels), '%f %f' % my_wcs.convert_to_radec(0, len(pixels)), \
-              color='white', fontsize=14)
-    pads.text(len(pixels[0]), 0, '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), 0), \
-              color='white', fontsize=14)
-    pads.text(len(pixels[0]), len(pixels), '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), len(pixels)), \
-              color='white', fontsize=14)
+ #   pads.text(0, 0, '%f %f' % my_wcs.convert_to_radec(0, 0), \
+ #             color='white', fontsize=14)
+ #   pads.text(0, len(pixels), '%f %f' % my_wcs.convert_to_radec(0, len(pixels)), \
+ #             color='white', fontsize=14)
+ #   pads.text(len(pixels[0]), 0, '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), 0), \
+ #             color='white', fontsize=14)
+ #   pads.text(len(pixels[0]), len(pixels), '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), len(pixels)), \
+ #             color='white', fontsize=14)
 
     # create the dictionnary of clusters
     # in the same time, find the maximum integral luminosity cluster
     max_integral = 0
+    max_integral_key = ''
     for cluster in clusters_list:
         key = '%f %f' % cluster.centroid
         clusters_dico[key] = cluster
-        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], cluster.centroid[1]) # local attribute
-        pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
-                  color='white', fontsize=14) # display centroid coordinates
+        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[1], cluster.centroid[0]) # local attribute # c'est inversé apparemment
+ #       pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
+ #                 color='white', fontsize=14) # display centroid coordinates
         if cluster.integral > max_integral:
             max_integral = cluster.integral
             max_integral_key = key
-        print cluster.centroid_wcs, max_integral, max_integral_key
-    print clusters_dico[max_integral_key].centroid
 
+    event_handler(fig, my_wcs)
     # display
     plt.show()
 

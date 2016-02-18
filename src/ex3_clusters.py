@@ -62,7 +62,7 @@ def main():
                               % (len(clusters_list), max_integral) + \
                               'centroid x: %4.1f, centroid y: %4.1f' \
                               % (clusters_dico[max_integral_key].centroid[1], \
-                               clusters_dico[max_integral_key].centroid[0])) # résultat à l'envers
+                               clusters_dico[max_integral_key].centroid[0])) # résultat à l'envers apparemment
 
     except IOError:
         print "File not found :", output_file_path
