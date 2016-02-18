@@ -22,13 +22,7 @@ def main():
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex3.txt"
 
     # open file and retrieve data
-    try:
-        with fits.open(input_file_path) as data_blocks:
-            pixels = data_blocks[0].data
-
-    except IOError:
-        print "File not found :", input_file_path
-        return 1
+    _, pixels = mylib.open_fits(input_file_path)
 
     # creation of the histogram from the data
     bin_number = 200
@@ -55,16 +49,22 @@ def main():
     # create the dictionnary of clusters
     # in the same time, find the maximum integral
     max_integral = 0
+    max_integral_key = ''
     for cluster in clusters_list:
         if cluster.integral > max_integral:
             max_integral = cluster.integral
+            max_integral_key = '%f %f' % cluster.centroid
         clusters_dico['%f %f' % cluster.centroid] = cluster
 
+    print clusters_dico[max_integral_key].box_ymax, clusters_dico[max_integral_key].box_ymin
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('number of clusters: %d, greatest integral: %d' \
-                              % (len(clusters_list), max_integral))
+            output_file.write('number of clusters: %2d, greatest integral: %7d, ' \
+                              % (len(clusters_list), max_integral) + \
+                              'centroid x: %4.1f, centroid y: %4.1f' \
+                              % (clusters_dico[max_integral_key].centroid[1], \
+                               clusters_dico[max_integral_key].centroid[0])) # résultat à l'envers
 
     except IOError:
         print "File not found :", output_file_path

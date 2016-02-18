@@ -21,13 +21,26 @@ class Cluster:
         :param pixels: original image to look in
         """
         self.pixel_list = []
-        self.centroid = (-1., -1.)
-        self.centroid_value = -1.
         self.integral = 0.
+        # Initialization of the coordinates (centroid and bounding box)
+        # with the first pixel
+        self.box_xmin, self.box_ymin = pixel_list[0]
+        self.box_xmax, self.box_ymax = pixel_list[0]
+        self.centroid = pixel_list[0]
 
         for (x, y) in pixel_list:
             self.pixel_list.append((x, y))  # deep copy of the input pixel list in the object pixel list
             self.integral += pixels[x, y]   # compute the integral of the cluster
-            if pixels[x, y] > self.centroid_value:  # find the centroid and its value (max pixel value)
-                self.centroid = (x, y)
-                self.centroid_value = pixels[x, y]
+            # Check if the new pixel enlarges the bounding box
+            if x > self.box_xmax:
+                self.box_xmax = x
+            elif x < self.box_xmin:
+                self.box_xmin = x
+            if y > self.box_ymax:
+                self.box_ymax = y
+            elif y < self.box_ymin:
+                self.box_ymin = y
+
+        # find the centroid
+        self.centroid = (self.box_xmax + self.box_xmin) / 2., \
+                        (self.box_ymax + self.box_ymin) / 2.

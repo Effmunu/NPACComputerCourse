@@ -64,6 +64,12 @@ class WCS(object):
         ra, dec = sky[0]
         return ra, dec
 
+    def convert_to_xy(self, ra, dec):
+        '''convert to x/y'''
+        pixel = np.array([[ra, dec],], np.float_)
+        sky = self.wcs.wcs_world2pix(pixel, 0)
+        x, y = sky[0]
+        return x, y
 
 def get_objects(ra, dec, radius):
     """
