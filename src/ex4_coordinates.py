@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Reading a FITS file, finding the clusters
+Reading a FITS file, finding the clusters,
  and converting their centroid coordinates to WCS coordinates.
 :Author: LAL npac09 <laudrain@ipno.in2p3.fr>
 :Date:   February 2016
@@ -10,11 +10,12 @@ Reading a FITS file, finding the clusters
 
 import sys
 import numpy as np
-from astropy.io import fits
 import matplotlib.pyplot as plt
 import library
-import Cluster
 import mylib
+
+# pylint: disable=E1101
+# 'numpy' has indeed an 'histogram' member, this error is not relevant
 
 def move(event):
     """
@@ -26,21 +27,15 @@ def move(event):
 
 def main():
     """
-
+    Reading a FITS file, finding the clusters,
+    and converting their centroid coordinates to WCS coordinates.
     """
 
     input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex4.txt"
 
     # open file and retrieve data and header
-    try:
-        with fits.open(input_file_path) as data_blocks:
-            pixels = data_blocks[0].data
-            header = data_blocks[0].header
-
-    except IOError:
-        print "File not found :", input_file_path
-        return 1
+    _, pixels = mylib.open_fits(input_file_path)
 
     # creation of the histogram from the data
     bin_number = 200
@@ -79,13 +74,13 @@ def main():
 
     # Display the corners coordinates
     pads.text(0, 0, '%f %f' % my_wcs.convert_to_radec(0, 0), \
-              color = 'white', fontsize = 14)
+              color='white', fontsize=14)
     pads.text(0, len(pixels), '%f %f' % my_wcs.convert_to_radec(0, len(pixels)), \
-              color = 'white', fontsize = 14)
+              color='white', fontsize=14)
     pads.text(len(pixels[0]), 0, '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), 0), \
-              color = 'white', fontsize = 14)
+              color='white', fontsize=14)
     pads.text(len(pixels[0]), len(pixels), '%f %f' % my_wcs.convert_to_radec(len(pixels[0]), len(pixels)), \
-              color = 'white', fontsize = 14)
+              color='white', fontsize=14)
 
     # create the dictionnary of clusters
     # in the same time, find the maximum integral luminosity cluster
@@ -95,7 +90,7 @@ def main():
         clusters_dico[key] = cluster
         cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], cluster.centroid[1]) # local attribute
         pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
-                  color = 'white', fontsize = 14) # display centroid coordinates
+                  color='white', fontsize=14) # display centroid coordinates
         if cluster.integral > max_integral:
             max_integral = cluster.integral
             max_integral_key = key
