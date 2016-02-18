@@ -66,28 +66,51 @@ def main():
         cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[1], \
                                                        cluster.centroid[0])
         # local attribute # c'est inversé apparemment
- #       pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
- #                 color='white', fontsize=14) # display centroid coordinates
         if cluster.integral > max_integral:
             max_integral = cluster.integral
             max_integral_key = key
 
-    radius = 0.003
-    celestial_objects = library.get_objects(clusters_dico[max_integral_key].centroid_wcs[0], \
-                                            clusters_dico[max_integral_key].centroid_wcs[1],
-                                            radius)
 
-    first_key = celestial_objects.keys()[0] # initialize
-    for key in celestial_objects.keys():
-        if celestial_objects[key] == 'Unknown':
+    # plot
+    fig, pads = plt.subplots()
+
+    # background removal on the image
+    mask = pixels >= background + threshold
+        # 2D-array of booleans, 'True' if value is above bkg
+    pixels_bkg_sub = mask * (pixels - background)
+    # visualization of the image before and after bkg removal
+    pads.imshow(pixels_bkg_sub)
+
+
+
+    radius = 0.003
+    max_integral_first_key = ''
+    # Get the object name for each cluster. Also, find the max_integral object name
+    for cluster_key in clusters_dico.keys():
+        celestial_objects = library.get_objects(clusters_dico[cluster_key].centroid_wcs[0], \
+                                                clusters_dico[cluster_key].centroid_wcs[1],
+                                                radius)
+        if not celestial_objects: # empty dictionary = False
             continue
-        if key < first_key: # if before in alphabetic order
-            first_key = key
+        first_key = celestial_objects.keys()[0] # initialize
+        for key in celestial_objects.keys():
+            if celestial_objects[key] == 'Unknown':
+                continue
+            if key < first_key: # if before in alphabetic order
+                first_key = key
+        pads.text(clusters_dico[cluster_key].centroid[1], clusters_dico[cluster_key].centroid[0], \
+                  '.%s' % first_key, color='white', fontsize=14)
+        if cluster_key == max_integral_key: # If the current cluster is the max integral one
+            max_integral_object = first_key
+
+    plt.show()
+
+
 
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('celestial object: %s' % first_key)
+            output_file.write('celestial object: %s' % max_integral_object)
 
     except IOError:
         print "File not found :", output_file_path
