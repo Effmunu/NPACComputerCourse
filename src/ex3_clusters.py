@@ -9,9 +9,10 @@ Finding the clusters of pixels above a threshold in an FITS image, after backgro
 
 import sys
 import numpy as np
-from astropy.io import fits
-import Cluster
 import mylib
+
+# pylint: disable=E1101
+# 'numpy' has indeed an 'histogram' member, this error is not relevant
 
 def main():
     """
@@ -40,8 +41,6 @@ def main():
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
-    # We define an array of pixels visited: 1 if visited, 0 elsewise
-    pixels_visited = np.zeros_like(pixels)
     # find the clusters.
     clusters_list = mylib.find_clusters(pixels, threshold)
     clusters_dico = {}
