@@ -24,7 +24,7 @@ def main():
     and converting their centroid coordinates to WCS coordinates.
     """
 
-    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
+    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex4.txt"
 
     # open file and retrieve data and header
