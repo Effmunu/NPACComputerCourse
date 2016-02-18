@@ -11,6 +11,24 @@ import library
 import Cluster
 
 ##########
+### For exercice 1
+##########
+def open_fits(input_file_path):
+    """
+    Open a FITS file and retrieve the header and the data of the first block.
+    :param input_file_path: FITS file path to be opened
+    :return: header, data of the first block [0]
+    """
+    try:
+        with fits.open(input_file_path) as data_blocks:
+            data_blocks.info()
+            return data_blocks[0].header, data_blocks[0].data
+
+    except IOError:
+        print "File not found :", input_file_path
+        return 1
+
+##########
 ### For exercice 2
 ##########
 def gaussian(x, amplitude, mean, sigma):
@@ -43,7 +61,7 @@ def fit(fitting_function, xdata, ydata):
 ##########
 ### For exercice 3
 ##########
-def explore_cluster(pixels_visited, pixels, x, y, threshold):
+def explore_cluster(pixels_visited, pixels, row, col, threshold):
     """
     The image is assumed to be a matrix
     with first coordinate going from top to bottom
@@ -51,46 +69,46 @@ def explore_cluster(pixels_visited, pixels, x, y, threshold):
 
     :param pixels_visited: boolean matrix of visited pixels (1 = visited)
     :param pixels: original image matrix
-    :param x: x coordinate of the seed to begin the search
-    :param y: y coordinate of the seed to begin the search
+    :param row: x coordinate of the seed to begin the search
+    :param col: y coordinate of the seed to begin the search
     :param threshold: detection threshold, usually "mean + 6*sigma"
     :return: the list of pixels in the cluster
     """
 
     # boundary conditions
-    if x < 0 or x >= len(pixels) \
-            or y < 0 or y >= len(pixels[0]):
+    if row < 0 or row >= len(pixels) \
+            or col < 0 or col >= len(pixels[0]):
         return []
     # if already tested
-    elif pixels_visited[x, y]:
+    elif pixels_visited[row, col]:
         return []
-    elif pixels[x, y] < threshold:
-        pixels_visited[x, y] = 1  # this pixel has been tested
+    elif pixels[row, col] < threshold:
+        pixels_visited[row, col] = 1  # this pixel has been tested
         return []
     else:
-        pixels_visited[x, y] = 1  # this pixel has been tested
-        return [(x, y)] + explore_cluster(pixels_visited, pixels, x, y-1, threshold) + \
-               explore_cluster(pixels_visited, pixels, x+1, y, threshold) + \
-               explore_cluster(pixels_visited, pixels, x, y+1, threshold) + \
-               explore_cluster(pixels_visited, pixels, x-1, y, threshold) # right, top, left, bottom
+        pixels_visited[row, col] = 1  # this pixel has been tested
+        return [(row, col)] + explore_cluster(pixels_visited, pixels, row, col-1, threshold) + \
+               explore_cluster(pixels_visited, pixels, row+1, col, threshold) + \
+               explore_cluster(pixels_visited, pixels, row, col+1, threshold) + \
+               explore_cluster(pixels_visited, pixels, row-1, col, threshold) # right, top, left, bottom
 
 def find_clusters(pixels, threshold):
     # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
     clusters_list = []
 
-    # WARNING : the components of pixels correspond to (x,y) as follows : pixels[x, y]
-    for x in range(len(pixels)):
-        for y in range(len(pixels[0])):
-            if pixels_visited[x, y]:
+    # WARNING : pixels[row, col]: row corresponds to x and col to y
+    for row in range(len(pixels[0])):
+        for col in range(len(pixels)):
+            if pixels_visited[row, col]:
                 continue # If pixel visited, go to next pixel (next step of the loop)
-            if pixels[x, y] < threshold:
-                pixels_visited[x, y] = 1 # visited
+            if pixels[row, col] < threshold:
+                pixels_visited[row, col] = 1 # visited
             else: # add the new cluster to the list
                 cluster = Cluster.Cluster(explore_cluster(
-                    pixels_visited, pixels, x, y, threshold), pixels)
+                    pixels_visited, pixels, row, col, threshold), pixels)
                 clusters_list.append(cluster)
-                pixels_visited[x, y] = 1 # visited
+                pixels_visited[row, col] = 1 # visited
 
     return clusters_list
 

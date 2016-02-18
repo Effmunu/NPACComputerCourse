@@ -10,7 +10,6 @@ Reading a FITS file and determining the background parameters.
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from astropy.io import fits
 import mylib
 
 
@@ -23,13 +22,7 @@ def main():
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex2.txt"
 
     # open file and retrieve data
-    try:
-        with fits.open(input_file_path) as data_blocks:
-            pixels = data_blocks[0].data
-
-    except IOError:
-        print "File not found :", input_file_path
-        return 1
+    _, pixels = mylib.open_fits(input_file_path)
 
     # creation of the histogram from the data
     bin_number = 200
