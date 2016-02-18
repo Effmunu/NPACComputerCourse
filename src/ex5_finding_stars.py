@@ -1,16 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+We read a FITS file, find the clusters,
+and convert their centroid coordinates to WCS coordinates.
+Then we display the celestial objects names on the image,
+following the mouse movement.
+:Author: LAL npac09 <laudrain@ipno.in2p3.fr>
+:Date:   February 2016
+"""
+
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import library
 import mylib
 
+# pylint: disable=E1101
+# 'numpy' has indeed an 'histogram' member, this error is not relevant
+
 def main():
     """
-    Reading a FITS file, finding the clusters,
-    and converting their centroid coordinates to WCS coordinates.
+    We read a FITS file, find the clusters,
+    and convert their centroid coordinates to WCS coordinates.
+    Then we display the celestial objects names on the image,
+    following the mouse movement.
     """
 
     input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
