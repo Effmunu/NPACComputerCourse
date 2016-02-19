@@ -1,1 +1,1 @@
-right ascension: 148.6979536331, declination: 69.3024298942
+right ascension: 148.698, declination: 69.302

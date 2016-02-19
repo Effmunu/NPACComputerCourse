@@ -100,18 +100,16 @@ def main():
     # display
     plt.show()
 
-
-
-
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('right ascension: %.10f, declination: %.10f' \
+            output_file.write('right ascension: %.3f, declination: %.3f' \
                               % (clusters_dico[max_integral_key].centroid_wcs))
 
     except IOError:
         print "File not found :", output_file_path
         return 2
+
     return 0
 
 if __name__ == '__main__':
