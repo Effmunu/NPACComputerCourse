@@ -28,35 +28,28 @@ def main():
     # creation of the histogram from the data
     bin_number = 200
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
-    bin_lower_boundaries = bin_boundaries[:-1]
 
     # apply the fit (no need for the amplitude (first parameter))
-    _, background, dispersion = mylib.gaussian_fit(bin_lower_boundaries, bin_values)
+    _, background, dispersion = mylib.gaussian_fit(bin_boundaries[:-1], bin_values)
 
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
     # find the clusters.
-    clusters_list = mylib.find_clusters(pixels, threshold)
-    clusters_dico = {}
+    clusters_list, clusters_dico = mylib.find_clusters(pixels, threshold)
 
-    # create the dictionnary of clusters
-    # in the same time, find the maximum integral
-    max_integral = 0
-    max_integral_key = ''
-    for cluster in clusters_list:
-        if cluster.integral > max_integral:
-            max_integral = cluster.integral
-            max_integral_key = '%f %f' % cluster.centroid
-        clusters_dico['%f %f' % cluster.centroid] = cluster
+    # find the maximum-integral cluster
+    max_integral_key = mylib.find_max_integral_cluster(clusters_list)
 
-    print clusters_dico[max_integral_key].box_xmin, clusters_dico[max_integral_key].box_xmax, \
-        clusters_dico[max_integral_key].box_ymin, clusters_dico[max_integral_key].box_ymax
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('number of clusters: %2d, greatest integral: %7d, centroid x: %4.1f, centroid y: %4.1f' \
-                              % (len(clusters_list), max_integral, clusters_dico[max_integral_key].centroid[0], clusters_dico[max_integral_key].centroid[1]))
+            output_file.write('number of clusters: %2d, greatest integral: %7d, '
+                              'centroid x: %4.1f, centroid y: %4.1f'
+                              % (len(clusters_list),
+                                 clusters_dico[max_integral_key].integral,
+                                 clusters_dico[max_integral_key].centroid[0],
+                                 clusters_dico[max_integral_key].centroid[1]))
 
     except IOError:
         print "File not found :", output_file_path

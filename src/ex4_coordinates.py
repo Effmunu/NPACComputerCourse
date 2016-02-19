@@ -45,10 +45,6 @@ def main():
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
-    # find the clusters.
-    clusters_list = mylib.find_clusters(pixels, threshold)
-    clusters_dico = {}
-
     # create a WCS object
     my_wcs = library.WCS(header)
 
@@ -75,21 +71,19 @@ def main():
               % my_wcs.convert_to_radec(len(pixels), len(pixels[0])), \
               color='white', fontsize=14)
 
-    # create the dictionnary of clusters
-    # in the same time, find the maximum integral luminosity cluster
-    max_integral = 0
-    max_integral_key = ''
+    # find the clusters.
+    clusters_list, clusters_dico = mylib.find_clusters(pixels, threshold)
+
+    # find the maximum-integral cluster
+    max_integral_key = mylib.find_max_integral_cluster(clusters_list)
+
+    #
     for cluster in clusters_list:
-        key = '%f %f' % cluster.centroid
-        clusters_dico[key] = cluster
         cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], \
                                                        cluster.centroid[1])
             # local attribute
  #       pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
  #                 color='white', fontsize=14) # display centroid coordinates
-        if cluster.integral > max_integral:
-            max_integral = cluster.integral
-            max_integral_key = key
 
     mylib.event_handler(fig, my_wcs, pixels)
     # display

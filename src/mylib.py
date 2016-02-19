@@ -4,6 +4,9 @@
 Personal functions
 """
 
+# pylint: disable=E1101
+# 'numpy' has indeed an 'exp' member, this error is not relevant
+
 from astropy.io import fits
 from scipy.optimize import curve_fit
 import numpy as np
@@ -91,15 +94,23 @@ def explore_cluster(pixels_visited, pixels, row, col, threshold):
         return []
     else:
         pixels_visited[row, col] = 1  # this pixel has been tested
-        return [(row, col)] + explore_cluster(pixels_visited, pixels, row, col-1, threshold) + \
+        return [(row, col)] + \
+               explore_cluster(pixels_visited, pixels, row, col-1, threshold) + \
                explore_cluster(pixels_visited, pixels, row+1, col, threshold) + \
                explore_cluster(pixels_visited, pixels, row, col+1, threshold) + \
-               explore_cluster(pixels_visited, pixels, row-1, col, threshold) # right, top, left, bottom
+               explore_cluster(pixels_visited, pixels, row-1, col, threshold)
 
 def find_clusters(pixels, threshold):
+    """
+    Find all the clusters in a FITS image, given a threshold
+    :param pixels: original image matrix
+    :param threshold:
+    :return: list of clusters in the image, dictionary of clusters indexed by centroid coordinates
+    """
     # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
     clusters_list = []
+    clusters_dico = {}
 
     # WARNING : pixels[row, col]: row corresponds to x and col to y
     for row in range(len(pixels[0])):
@@ -108,13 +119,23 @@ def find_clusters(pixels, threshold):
                 continue # If pixel visited, go to next pixel (next step of the loop)
             if pixels[row, col] < threshold:
                 pixels_visited[row, col] = 1 # visited
-            else: # add the new cluster to the list
+            else: # add the new cluster to the list and to the dictionary
                 cluster = Cluster.Cluster(explore_cluster(
                     pixels_visited, pixels, row, col, threshold), pixels)
                 clusters_list.append(cluster)
+                clusters_dico['%f %f' % cluster.centroid] = cluster
                 pixels_visited[row, col] = 1 # visited
 
-    return clusters_list
+    return clusters_list, clusters_dico
+
+def find_max_integral_cluster(clusters_list):
+    max_integral = 0
+    max_integral_key = ''
+    for cluster in clusters_list:
+        if cluster.integral > max_integral:
+            max_integral = cluster.integral
+            max_integral_key = '%f %f' % cluster.centroid
+    return max_integral_key
 
 ##########
 ### For exercice 4
