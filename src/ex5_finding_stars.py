@@ -58,9 +58,9 @@ def main():
     for cluster in clusters_list:
         key = '%f %f' % cluster.centroid
         clusters_dico[key] = cluster
-        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[1], \
-                                                       cluster.centroid[0])
-        # local attribute # c'est inversé apparemment
+        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], \
+                                                       cluster.centroid[1])
+            # local attribute
         if cluster.integral > max_integral:
             max_integral = cluster.integral
             max_integral_key = key
@@ -79,7 +79,7 @@ def main():
 
 
     radius = 0.003
-    max_integral_first_key = ''
+    max_integral_object = ''
     # Get the object name for each cluster. Also, find the max_integral object name
     for cluster_key in clusters_dico.keys():
         celestial_objects = library.get_objects(clusters_dico[cluster_key].centroid_wcs[0], \
@@ -93,7 +93,7 @@ def main():
                 continue
             if key < first_key: # if before in alphabetic order
                 first_key = key
-        pads.text(clusters_dico[cluster_key].centroid[1], clusters_dico[cluster_key].centroid[0], \
+        pads.text(clusters_dico[cluster_key].centroid[0], clusters_dico[cluster_key].centroid[1], \
                   '.%s' % first_key, color='white', fontsize=14)
         if cluster_key == max_integral_key: # If the current cluster is the max integral one
             max_integral_object = first_key

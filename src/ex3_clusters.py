@@ -50,14 +50,13 @@ def main():
             max_integral_key = '%f %f' % cluster.centroid
         clusters_dico['%f %f' % cluster.centroid] = cluster
 
+    print clusters_dico[max_integral_key].box_xmin, clusters_dico[max_integral_key].box_xmax, \
+        clusters_dico[max_integral_key].box_ymin, clusters_dico[max_integral_key].box_ymax
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('number of clusters: %2d, greatest integral: %7d, ' \
-                              % (len(clusters_list), max_integral) + \
-                              'centroid x: %4.1f, centroid y: %4.1f' \
-                              % (clusters_dico[max_integral_key].centroid[1], \
-                               clusters_dico[max_integral_key].centroid[0])) # résultat à l'envers apparemment
+            output_file.write('number of clusters: %2d, greatest integral: %7d, centroid x: %4.1f, centroid y: %4.1f' \
+                              % (len(clusters_list), max_integral, clusters_dico[max_integral_key].centroid[0], clusters_dico[max_integral_key].centroid[1]))
 
     except IOError:
         print "File not found :", output_file_path

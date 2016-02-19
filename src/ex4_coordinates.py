@@ -65,14 +65,14 @@ def main():
     # Display the corners coordinates
     pads.text(0, 0, '%f %f' % my_wcs.convert_to_radec(0, 0), \
               color='white', fontsize=14)
-    pads.text(0, len(pixels), '%f %f' \
-              % my_wcs.convert_to_radec(0, len(pixels)), \
+    pads.text(0, len(pixels[0]), '%f %f' \
+              % my_wcs.convert_to_radec(0, len(pixels[0])), \
               color='white', fontsize=14)
-    pads.text(len(pixels[0]), 0, '%f %f' \
-              % my_wcs.convert_to_radec(len(pixels[0]), 0), \
+    pads.text(len(pixels), 0, '%f %f' \
+              % my_wcs.convert_to_radec(len(pixels), 0), \
               color='white', fontsize=14)
-    pads.text(len(pixels[0]), len(pixels), '%f %f' \
-              % my_wcs.convert_to_radec(len(pixels[0]), len(pixels)), \
+    pads.text(len(pixels), len(pixels[0]), '%f %f' \
+              % my_wcs.convert_to_radec(len(pixels), len(pixels[0])), \
               color='white', fontsize=14)
 
     # create the dictionnary of clusters
@@ -82,9 +82,9 @@ def main():
     for cluster in clusters_list:
         key = '%f %f' % cluster.centroid
         clusters_dico[key] = cluster
-        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[1], \
-                                                       cluster.centroid[0])
-        # local attribute # c'est inversé apparemment
+        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], \
+                                                       cluster.centroid[1])
+            # local attribute
  #       pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
  #                 color='white', fontsize=14) # display centroid coordinates
         if cluster.integral > max_integral:

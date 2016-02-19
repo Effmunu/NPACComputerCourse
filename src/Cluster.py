@@ -23,23 +23,24 @@ class Cluster:
         self.pixel_list = []
         self.integral = 0.
         # Initialization of the coordinates (centroid and bounding box)
-        # with the first pixel
-        self.box_xmin, self.box_ymin = pixel_list[0]
-        self.box_xmax, self.box_ymax = pixel_list[0]
+        # with the first pixel (WARNING : we get (x,y) by taking (row, col))
+        self.box_ymin, self.box_xmin = pixel_list[0]
+        self.box_ymax, self.box_xmax = pixel_list[0]
         self.centroid = pixel_list[0]
 
-        for (x, y) in pixel_list:
-            self.pixel_list.append((x, y))  # deep copy of the input pixel list in the object pixel list
-            self.integral += pixels[x, y]   # compute the integral of the cluster
+        # WARNING : again, row corresponds to x, col to y
+        for (row, col) in pixel_list:
+            self.pixel_list.append((row, col))  # deep copy of the input pixel list in the object pixel list
+            self.integral += pixels[row, col]   # compute the integral of the cluster
             # Check if the new pixel enlarges the bounding box
-            if x > self.box_xmax:
-                self.box_xmax = x
-            elif x < self.box_xmin:
-                self.box_xmin = x
-            if y > self.box_ymax:
-                self.box_ymax = y
-            elif y < self.box_ymin:
-                self.box_ymin = y
+            if col > self.box_xmax:
+                self.box_xmax = col
+            elif col < self.box_xmin:
+                self.box_xmin = col
+            if row > self.box_ymax:
+                self.box_ymax = row
+            elif row < self.box_ymin:
+                self.box_ymin = row
 
         # find the centroid
         self.centroid = (self.box_xmax + self.box_xmin) / 2., \
