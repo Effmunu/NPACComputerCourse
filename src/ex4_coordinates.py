@@ -39,13 +39,8 @@ def main():
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
     bin_lower_boundaries = bin_boundaries[:-1]
 
-    # apply the fit
-    fit, _, m_x, _ = mylib.fit(mylib.gaussian, bin_lower_boundaries, bin_values)
-
-    # get back the un-normalized data
-#    maxvalue = fit[0] * m_y
-    background = fit[1] * m_x
-    dispersion = fit[2] * m_x
+    # apply the fit (no need for the amplitude (first parameter))
+    _, background, dispersion = mylib.gaussian_fit(bin_lower_boundaries, bin_values)
 
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)

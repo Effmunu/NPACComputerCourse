@@ -32,12 +32,7 @@ def main():
     bin_lower_boundaries = bin_boundaries[:-1]
 
     # apply the fit
-    fit, _, m_x, m_y = mylib.fit(mylib.gaussian, bin_lower_boundaries, bin_values)
-
-    # get back the un-normalized data
-    maxvalue = fit[0] * m_y
-    background = fit[1] * m_x
-    dispersion = fit[2] * m_x
+    maxvalue, background, dispersion = mylib.gaussian_fit(bin_lower_boundaries, bin_values)
 
     # visualization of the histogram and the fit
     _, pads = plt.subplots(1, 3)

@@ -37,26 +37,30 @@ def gaussian(x, amplitude, mean, sigma):
     """
     return amplitude * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
 
-def fit(fitting_function, xdata, ydata):
+def gaussian_fit(xdata, ydata):
     """
-    Fit a set of data with a function f.
-    :param f: fitting function
+    Fit a set of data with a gaussian function.
     :param xdata: bin boundaries values
     :param ydata: bin contents (values)
     :return:    The fit parameters array 'fit_param',
-                the covariant matrix 'covariant',
-                and the normalization parameters 'm_x' and 'm_y'.
+                and the covariant matrix 'covariant'.
     """
 
+    # normalization parameters
     m_x = np.float(np.max(xdata))
     m_y = np.float(np.max(ydata))
 
-    # apply the fit, we normalize the data to help the fitting program
-    fit_param, covariant = curve_fit(fitting_function, \
+    # apply the fit, normalize the data to help the fitting program (no need for covariant matrix)
+    fit_param, _ = curve_fit(gaussian, \
                        xdata / m_x, \
                        ydata / m_y)
 
-    return fit_param, covariant, m_x, m_y
+    # get back the un-normalized parameters
+    amplitude = fit_param[0] * m_y
+    background = fit_param[1] * m_x
+    dispersion = fit_param[2] * m_x
+
+    return amplitude, background, dispersion
 
 ##########
 ### For exercice 3
