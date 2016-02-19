@@ -36,20 +36,20 @@ def main():
     threshold = background + (6.0 * dispersion)
 
     # find the clusters.
-    clusters_list, clusters_dico = mylib.find_clusters(header, pixels, threshold)
+    cluster_list, cluster_dico = mylib.find_clusters(header, pixels, threshold)
 
     # find the maximum-integral cluster
-    max_integral_key = mylib.find_max_integral_cluster(clusters_list)
+    max_integral_key = mylib.find_max_integral_cluster(cluster_list)
 
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
             output_file.write('number of clusters: %2d, greatest integral: %7d, '
                               'centroid x: %4.1f, centroid y: %4.1f'
-                              % (len(clusters_list),
-                                 clusters_dico[max_integral_key].integral,
-                                 clusters_dico[max_integral_key].centroid[0],
-                                 clusters_dico[max_integral_key].centroid[1]))
+                              % (len(cluster_list),
+                                 cluster_dico[max_integral_key].integral,
+                                 cluster_dico[max_integral_key].centroid[0],
+                                 cluster_dico[max_integral_key].centroid[1]))
 
     except IOError:
         print "File not found :", output_file_path

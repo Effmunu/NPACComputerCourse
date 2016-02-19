@@ -51,10 +51,10 @@ def main():
     pads.imshow(mylib.remove_background(pixels, background, threshold))
 
     # find the clusters.
-    clusters_list, clusters_dico = mylib.find_clusters(header, pixels, threshold)
+    cluster_list, cluster_dico = mylib.find_clusters(header, pixels, threshold)
 
     # find the maximum-integral cluster
-    max_integral_key = mylib.find_max_integral_cluster(clusters_list)
+    max_integral_key = mylib.find_max_integral_cluster(cluster_list)
 
     # call the event handler
     mylib.event_handler(fig, header, pixels)
@@ -66,7 +66,7 @@ def main():
     try:
         with open(output_file_path, 'w') as output_file:
             output_file.write('right ascension: %.3f, declination: %.3f' \
-                              % (clusters_dico[max_integral_key].centroid_wcs))
+                              % (cluster_dico[max_integral_key].centroid_wcs))
 
     except IOError:
         print "File not found :", output_file_path
