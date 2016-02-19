@@ -121,8 +121,8 @@ def find_clusters(header, pixels, threshold):
     """
     # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
-    clusters_list = []
-    clusters_dico = {}
+    cluster_list = []
+    cluster_dico = {}
 
     # WARNING : pixels[row, col]: row corresponds to x and col to y
     for row in range(len(pixels[0])):
@@ -134,21 +134,21 @@ def find_clusters(header, pixels, threshold):
             else: # add the new cluster to the list and to the dictionary
                 cluster = Cluster.Cluster(explore_cluster(
                     pixels_visited, pixels, row, col, threshold), pixels, header)
-                clusters_list.append(cluster)
-                clusters_dico['%f %f' % cluster.centroid] = cluster
+                cluster_list.append(cluster)
+                cluster_dico['%f %f' % cluster.centroid] = cluster
                 pixels_visited[row, col] = 1 # visited
 
-    return clusters_list, clusters_dico
+    return cluster_list, cluster_dico
 
-def find_max_integral_cluster(clusters_list):
+def find_max_integral_cluster(cluster_list):
     """
-    :param clusters_list: list of cluster objects
+    :param cluster_list: list of cluster objects
     :return: the dictionary key of the cluster with maximal integral
             (string with coordinates of the centroid)
     """
     max_integral = 0
     max_integral_key = ''
-    for cluster in clusters_list:
+    for cluster in cluster_list:
         if cluster.integral > max_integral:
             max_integral = cluster.integral
             max_integral_key = '%f %f' % cluster.centroid
@@ -188,3 +188,53 @@ def event_handler(fig, header, pixels):
         text_id.remove()
 
     fig.canvas.mpl_connect('motion_notify_event', move)
+
+##########
+### For exercice 5
+##########
+
+# TODO : possible upgrade : only display the rectangle when the mouse is
+# over it, meaning we should connect to mpl in the event handler
+
+def event_handler2(fig, header, pixels, cluster_list, cluster_name_dico):
+    """
+    Event handler
+    :param fig: the canvas to draw into
+    :param my_wcs: The conversion tool for coordinates
+    :param pixels: The image to display
+    :return:
+    """
+    # create a WCS object to make unit conversions
+    my_wcs = library.WCS(header)
+
+    def on_click(event):
+        if event.xdata >= len(pixels) or event.xdata < 0 \
+                or event.ydata >= len(pixels) or event.ydata < 0:
+            # if outside the image
+            return
+
+        pads = event.inaxes     # get the current pad
+
+        centroid_to_query = -1, -1
+        for cluster in cluster_list:
+#            if (event.xdata, event.ydata) in cluster.pixel_list:
+            if event.xdata >= cluster.box_xmin and \
+                            event.xdata <= cluster.box_xmax and \
+                            event.ydata >= cluster.box_ymin and \
+                            event.ydata <= cluster.box_ymax:
+                centroid_to_query = '%f %f' % (cluster.centroid[0], cluster.centroid[1])
+                break   # found the cluster clicked on
+        # if we didn't click on a cluster box, just redraw the picture
+        if centroid_to_query[0] < 0:
+            event.canvas.draw()
+            return
+
+        text_id = pads.text(event.xdata, event.ydata, "%f, %f \n%s"
+                            % (my_wcs.convert_to_radec(event.xdata, event.ydata)[0],
+                               my_wcs.convert_to_radec(event.xdata, event.ydata)[1],
+                               cluster_name_dico[centroid_to_query]),
+                            fontsize=14, color='white')
+        event.canvas.draw()
+        text_id.remove()
+
+    fig.canvas.mpl_connect('button_press_event', on_click)

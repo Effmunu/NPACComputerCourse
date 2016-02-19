@@ -13,6 +13,7 @@ following the mouse movement.
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import library
 import mylib
 
@@ -45,46 +46,58 @@ def main():
     threshold = background + (6.0 * dispersion)
 
     # find the clusters.
-    clusters_list, clusters_dico = mylib.find_clusters(pixels, threshold)
+    cluster_list, cluster_dico = mylib.find_clusters(header, pixels, threshold)
 
     # find the maximum-integral cluster
-    max_integral_key = mylib.find_max_integral_cluster(clusters_list)
+    max_integral_key = mylib.find_max_integral_cluster(cluster_list)
 
     # plot
     fig, pads = plt.subplots()
-
+    # Display the image without background
     pads.imshow(mylib.remove_background(pixels, background, threshold))
 
+    # Display the boxes around clusters
+    for cluster in cluster_list:
+        pads.add_patch(patches.Rectangle((cluster.box_xmin, cluster.box_ymin),
+                                         cluster.box_xmax - cluster.box_xmin,
+                                         cluster.box_ymax - cluster.box_ymin,
+                                         fill=False, color='white'))
 
-
+    # define an accetance radius around a given position
     radius = 0.003
-    max_integral_object = ''
-    # Get the object name for each cluster. Also, find the max_integral object name
-    for cluster_key in clusters_dico.keys():
-        celestial_objects = library.get_objects(clusters_dico[cluster_key].centroid_wcs[0], \
-                                                clusters_dico[cluster_key].centroid_wcs[1],
+    # Get the object name for each cluster.
+    # Also, find the max_integral object name
+    max_integral_object_name = ''
+    # I create a name dico, so that we won't have to query for them every time
+    cluster_name_dico = {}  # associate a centriod value (string) to the name
+    for cluster_key in cluster_dico.keys():
+        celestial_objects = library.get_objects(cluster_dico[cluster_key].centroid_wcs[0], \
+                                                cluster_dico[cluster_key].centroid_wcs[1],
                                                 radius)
         if not celestial_objects: # empty dictionary = False
+            cluster_name_dico[cluster_key] = 'NO OBJECT FOUND'
             continue
+        # now, there is at least one name available
+        # find the first name in alphabetical order, skipping the 'Unknown'
         first_key = celestial_objects.keys()[0] # initialize
         for key in celestial_objects.keys():
             if celestial_objects[key] == 'Unknown':
                 continue
             if key < first_key: # if before in alphabetic order
                 first_key = key
-        pads.text(clusters_dico[cluster_key].centroid[0], clusters_dico[cluster_key].centroid[1], \
-                  '.%s' % first_key, color='white', fontsize=14)
+        cluster_name_dico[cluster_key] = first_key
         if cluster_key == max_integral_key: # If the current cluster is the max integral one
-            max_integral_object = first_key
+            max_integral_object_name = first_key
+
+    # call the event handler
+    mylib.event_handler2(fig, header, pixels, cluster_list, cluster_name_dico)
 
     plt.show()
-
-
 
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('celestial object: %s' % max_integral_object)
+            output_file.write('celestial object: %s' % max_integral_object_name)
 
     except IOError:
         print "File not found :", output_file_path
