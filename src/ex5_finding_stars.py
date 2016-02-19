@@ -44,30 +44,16 @@ def main():
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
-    # create a WCS object
-    my_wcs = library.WCS(header)
-
     # find the clusters.
     clusters_list, clusters_dico = mylib.find_clusters(pixels, threshold)
 
     # find the maximum-integral cluster
     max_integral_key = mylib.find_max_integral_cluster(clusters_list)
 
-    # in the same time, find the maximum integral luminosity cluster
-    for cluster in clusters_list:
-        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], \
-                                                       cluster.centroid[1])
-            # local attribute
-
     # plot
     fig, pads = plt.subplots()
 
-    # background removal on the image
-    mask = pixels >= background + threshold
-        # 2D-array of booleans, 'True' if value is above bkg
-    pixels_bkg_sub = mask * (pixels - background)
-    # visualization of the image before and after bkg removal
-    pads.imshow(pixels_bkg_sub)
+    pads.imshow(mylib.remove_background(pixels, background, threshold))
 
 
 

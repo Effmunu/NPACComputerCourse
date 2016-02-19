@@ -65,6 +65,17 @@ def gaussian_fit(xdata, ydata):
 
     return amplitude, background, dispersion
 
+def remove_background(pixels, background, threshold):
+    """
+    :param pixels: original image matrix
+    :param background: mean value of the gaussian fit on the pixel distribution
+    :param threshold:
+    :return: an image, similar to 'pixels', with the background removed
+    """
+    mask = pixels >= background + threshold
+    # mask is a 2D-array of booleans, 'True' if value is above bkg
+    return mask * (pixels - background)
+
 ##########
 ### For exercice 3
 ##########
@@ -100,9 +111,10 @@ def explore_cluster(pixels_visited, pixels, row, col, threshold):
                explore_cluster(pixels_visited, pixels, row, col+1, threshold) + \
                explore_cluster(pixels_visited, pixels, row-1, col, threshold)
 
-def find_clusters(pixels, threshold):
+def find_clusters(header, pixels, threshold):
     """
     Find all the clusters in a FITS image, given a threshold
+    :param header: header of the FITS image
     :param pixels: original image matrix
     :param threshold:
     :return: list of clusters in the image, dictionary of clusters indexed by centroid coordinates
@@ -121,7 +133,7 @@ def find_clusters(pixels, threshold):
                 pixels_visited[row, col] = 1 # visited
             else: # add the new cluster to the list and to the dictionary
                 cluster = Cluster.Cluster(explore_cluster(
-                    pixels_visited, pixels, row, col, threshold), pixels)
+                    pixels_visited, pixels, row, col, threshold), pixels, header)
                 clusters_list.append(cluster)
                 clusters_dico['%f %f' % cluster.centroid] = cluster
                 pixels_visited[row, col] = 1 # visited
@@ -129,6 +141,11 @@ def find_clusters(pixels, threshold):
     return clusters_list, clusters_dico
 
 def find_max_integral_cluster(clusters_list):
+    """
+    :param clusters_list: list of cluster objects
+    :return: the dictionary key of the cluster with maximal integral
+            (string with coordinates of the centroid)
+    """
     max_integral = 0
     max_integral_key = ''
     for cluster in clusters_list:
@@ -140,7 +157,10 @@ def find_max_integral_cluster(clusters_list):
 ##########
 ### For exercice 4
 ##########
-def event_handler(fig, my_wcs, pixels):
+
+# TODO possible upgrade : also display the info 'on_click'
+
+def event_handler(fig, header, pixels):
     """
     Event handler
     :param fig: the canvas to draw into
@@ -148,6 +168,9 @@ def event_handler(fig, my_wcs, pixels):
     :param pixels: The image to display
     :return:
     """
+    # create a WCS object to make unit conversions
+    my_wcs = library.WCS(header)
+
     def move(event):
         """
         Action on mouse movement
@@ -165,37 +188,3 @@ def event_handler(fig, my_wcs, pixels):
         text_id.remove()
 
     fig.canvas.mpl_connect('motion_notify_event', move)
-
-
-if __name__ == '__main__':
-
-    # test_Simbad
-    objects = library.get_objects(1.0, 1.0, 0.1)
-    for object in objects:
-        print '%s (%s)' % (object, objects[object])
-    if len(objects) != 14:
-        print 'error'
-
-    # test_WCS
-
-    header = None
-    try:
-        with fits.open('../data/dss.19.59.54.3+09.59.20.9 10x10.fits') as data_fits:
-            try:
-                data_fits.verify('silentfix')
-                header = data_fits[0].header
-            except ValueError as err:
-                logging.error('Error: %s', err)
-    except EnvironmentError as err:
-        logging.error('Cannot open the data fits file. - %s', err)
-
-    w = library.WCS(header)
-    ra, dec = w.convert_to_radec(0, 0)
-
-    print ra, dec
-
-    if abs(ra - 300.060983768) > 1e-5:
-        print 'error'
-
-    if abs(dec - 9.90624639801) > 1e5:
-        print 'error'

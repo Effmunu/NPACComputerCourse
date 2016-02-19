@@ -5,10 +5,13 @@
 Provided utilities for the exercices
 '''
 
+# pylint: disable=E1101
+# 'numpy' has indeed an 'float_' member, this error is not relevant
+
 import urllib2
+import time
 import numpy as np
 from astropy import wcs
-import time
 
 
 def dms(angle):

@@ -33,6 +33,7 @@ def main():
 
     # apply the fit
     maxvalue, background, dispersion = mylib.gaussian_fit(bin_lower_boundaries, bin_values)
+    threshold = 6.0 * dispersion
 
     # visualization of the histogram and the fit
     _, pads = plt.subplots(1, 3)
@@ -46,14 +47,9 @@ def main():
     pads[2].set_xlabel('Amplitude')
     pads[2].set_ylabel('Frequency')
 
-    # background removal
-    mask = pixels >= background + 6.0 * dispersion
-        # 2D-array of booleans, 'True' if value is above bkg
-    pixels_bkg_sub = mask * (pixels - background)
-
     # visualization of the image before and after bkg removal
     pads[0].imshow(pixels)
-    pads[1].imshow(pixels_bkg_sub)
+    pads[1].imshow(mylib.remove_background(pixels, background, threshold))
 
     plt.show()
 

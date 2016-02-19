@@ -13,12 +13,13 @@ following the mouse movement.
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import library
 import mylib
 
 # pylint: disable=E1101
 # 'numpy' has indeed an 'histogram' member, this error is not relevant
 
+# pylint: disable=R0914
+# Only 17 local variables, and the code is already simple enough
 
 def main():
     """
@@ -37,55 +38,27 @@ def main():
     # creation of the histogram from the data
     bin_number = 200
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
-    bin_lower_boundaries = bin_boundaries[:-1]
 
     # apply the fit (no need for the amplitude (first parameter))
-    _, background, dispersion = mylib.gaussian_fit(bin_lower_boundaries, bin_values)
-
+    _, background, dispersion = mylib.gaussian_fit(bin_boundaries[:-1], bin_values)
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
-
-    # create a WCS object
-    my_wcs = library.WCS(header)
 
     # plot
     fig, pads = plt.subplots()
 
-    # background removal on the image
-    mask = pixels >= background + threshold
-        # 2D-array of booleans, 'True' if value is above bkg
-    pixels_bkg_sub = mask * (pixels - background)
-    # visualization of the image before and after bkg removal
-    pads.imshow(pixels_bkg_sub)
-
-    # Display the corners coordinates
-    pads.text(0, 0, '%f %f' % my_wcs.convert_to_radec(0, 0), \
-              color='white', fontsize=14)
-    pads.text(0, len(pixels[0]), '%f %f' \
-              % my_wcs.convert_to_radec(0, len(pixels[0])), \
-              color='white', fontsize=14)
-    pads.text(len(pixels), 0, '%f %f' \
-              % my_wcs.convert_to_radec(len(pixels), 0), \
-              color='white', fontsize=14)
-    pads.text(len(pixels), len(pixels[0]), '%f %f' \
-              % my_wcs.convert_to_radec(len(pixels), len(pixels[0])), \
-              color='white', fontsize=14)
+    # visualization of the image after bkg removal
+    pads.imshow(mylib.remove_background(pixels, background, threshold))
 
     # find the clusters.
-    clusters_list, clusters_dico = mylib.find_clusters(pixels, threshold)
+    clusters_list, clusters_dico = mylib.find_clusters(header, pixels, threshold)
 
     # find the maximum-integral cluster
     max_integral_key = mylib.find_max_integral_cluster(clusters_list)
 
-    #
-    for cluster in clusters_list:
-        cluster.centroid_wcs = my_wcs.convert_to_radec(cluster.centroid[0], \
-                                                       cluster.centroid[1])
-            # local attribute
- #       pads.text(cluster.centroid[1], cluster.centroid[0], '%f %f' % cluster.centroid_wcs, \
- #                 color='white', fontsize=14) # display centroid coordinates
+    # call the event handler
+    mylib.event_handler(fig, header, pixels)
 
-    mylib.event_handler(fig, my_wcs, pixels)
     # display
     plt.show()
 

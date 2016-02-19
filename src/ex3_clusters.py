@@ -23,7 +23,7 @@ def main():
     output_file_path = "/Users/npac09/PycharmProjects/npac09/src/ex3.txt"
 
     # open file and retrieve data
-    _, pixels = mylib.open_fits(input_file_path)
+    header, pixels = mylib.open_fits(input_file_path)
 
     # creation of the histogram from the data
     bin_number = 200
@@ -36,7 +36,7 @@ def main():
     threshold = background + (6.0 * dispersion)
 
     # find the clusters.
-    clusters_list, clusters_dico = mylib.find_clusters(pixels, threshold)
+    clusters_list, clusters_dico = mylib.find_clusters(header, pixels, threshold)
 
     # find the maximum-integral cluster
     max_integral_key = mylib.find_max_integral_cluster(clusters_list)
