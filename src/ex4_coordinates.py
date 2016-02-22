@@ -14,12 +14,44 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import mylib
+import library
 
 # pylint: disable=E1101
 # 'numpy' has indeed an 'histogram' member, this error is not relevant
 
 # pylint: disable=R0914
 # Only 17 local variables, and the code is already simple enough
+
+# TODO possible upgrade : also display the info 'on_click'. Remove the last text on the screen
+def event_handler(fig, header, pixels):
+    """
+    Event handler
+    :param fig: the canvas to draw into
+    :param my_wcs: The conversion tool for coordinates
+    :param pixels: The image to display
+    :return:
+    """
+    # create a WCS object to make unit conversions
+    my_wcs = library.WCS(header)
+
+    def move(event):
+        """
+        Action on mouse movement
+        :param event: the event
+        :return:
+        """
+        if event.xdata >= len(pixels) or event.xdata < 0 \
+                or event.ydata >= len(pixels) or event.ydata < 0:
+            return
+        pads = event.inaxes     #event.inaxes renvoie le pad courant
+        text_id = pads.text(event.xdata, event.ydata,
+                            "%f, %f" % my_wcs.convert_to_radec(event.xdata, event.ydata),
+                            fontsize=14, color='white')
+        event.canvas.draw()
+        text_id.remove()
+
+    fig.canvas.mpl_connect('motion_notify_event', move)
+
 
 def main():
     """
@@ -57,7 +89,7 @@ def main():
     max_integral_key = mylib.find_max_integral_cluster(cluster_list)
 
     # call the event handler
-    mylib.event_handler(fig, header, pixels)
+    event_handler(fig, header, pixels)
 
     # display
     plt.show()

@@ -20,6 +20,52 @@ import mylib
 # pylint: disable=E1101
 # 'numpy' has indeed an 'histogram' member, this error is not relevant
 
+# TODO : possible upgrade : only display the rectangle when the mouse is
+# over it, meaning we should connect to mpl in the event handler
+def event_handler(fig, header, pixels, cluster_list, cluster_dico):
+    """
+    Event handler
+    :param fig: the canvas to draw into
+    :param my_wcs: The conversion tool for coordinates
+    :param pixels: The image to display
+    :return:
+    """
+    # create a WCS object to make unit conversions
+    my_wcs = library.WCS(header)
+
+    def on_click(event):
+        if event.xdata >= len(pixels) or event.xdata < 0 \
+                or event.ydata >= len(pixels) or event.ydata < 0:
+            # if outside the image
+            return
+
+        pads = event.inaxes     # get the current pad
+
+        centroid_to_query = -1, -1
+        for cluster in cluster_list:
+#            if (event.xdata, event.ydata) in cluster.pixel_list:
+            if event.xdata >= cluster.box_xmin and \
+                            event.xdata <= cluster.box_xmax and \
+                            event.ydata >= cluster.box_ymin and \
+                            event.ydata <= cluster.box_ymax:
+                centroid_to_query = '%f %f' % (cluster.centroid[0], cluster.centroid[1])
+                break   # found the cluster clicked on
+        # if we didn't click on a cluster box, just redraw the picture
+        if centroid_to_query[0] < 0:
+            event.canvas.draw()
+            return
+
+        text_id = pads.text(event.xdata, event.ydata, "%f, %f \n%s"
+                            % (my_wcs.convert_to_radec(event.xdata, event.ydata)[0],
+                               my_wcs.convert_to_radec(event.xdata, event.ydata)[1],
+                               cluster_dico[centroid_to_query][1]),
+                            fontsize=14, color='white')
+        event.canvas.draw()
+        text_id.remove()
+
+    fig.canvas.mpl_connect('button_press_event', on_click)
+
+
 def main():
     """
     We read a FITS file, find the clusters,
@@ -64,7 +110,7 @@ def main():
     max_integral_key = mylib.find_max_integral_cluster(cluster_list)
 
     # call the event handler
-    mylib.event_handler2(fig, header, pixels, cluster_list, cluster_dico)
+    event_handler(fig, header, pixels, cluster_list, cluster_dico)
 
     plt.show()
 
