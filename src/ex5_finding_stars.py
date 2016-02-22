@@ -20,7 +20,10 @@ import mylib
 # pylint: disable=E1101
 # 'numpy' has indeed an 'histogram' member, this error is not relevant
 
-# TODO : possible upgrade : only display the rectangle when the mouse is
+# pylint: disable=R0914
+# Only 19 local variables, and the code is already simple enough
+
+# TO-DO : possible upgrade : only display the rectangle when the mouse is
 # over it, meaning we should connect to mpl in the event handler
 def event_handler(fig, header, pixels, cluster_list, cluster_dico):
     """
@@ -34,6 +37,12 @@ def event_handler(fig, header, pixels, cluster_list, cluster_dico):
     my_wcs = library.WCS(header)
 
     def on_click(event):
+        """
+        Action to execute when clicked on the image.
+        If outside the image, do not do anything
+        :param event: the event
+        :return:
+        """
         if event.xdata >= len(pixels) or event.xdata < 0 \
                 or event.ydata >= len(pixels) or event.ydata < 0:
             # if outside the image

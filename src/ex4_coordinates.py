@@ -22,7 +22,7 @@ import library
 # pylint: disable=R0914
 # Only 17 local variables, and the code is already simple enough
 
-# TODO possible upgrade : also display the info 'on_click'. Remove the last text on the screen
+# to-do possible upgrade : remove the last text on the screen
 def event_handler(fig, header, pixels):
     """
     Event handler
@@ -36,7 +36,8 @@ def event_handler(fig, header, pixels):
 
     def move(event):
         """
-        Action on mouse movement
+        Action on mouse movement.
+        If outside the image, do not do anything.
         :param event: the event
         :return:
         """
