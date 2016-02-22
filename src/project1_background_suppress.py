@@ -60,7 +60,6 @@ def main():
 
     # apply the fit
     _, background, dispersion = mylib.gaussian_fit(bin_boundaries[:-1], bin_values)
-    threshold = 6.0 * dispersion # may remove this line, not needed : just help for next exo
 
     # plot
     _, pads = plt.subplots()
@@ -70,7 +69,7 @@ def main():
     # pad containing the slider : left, bot, width, height
     pad_slider = plt.axes([0.25, 0.1, 0.65, 0.03], axisbg='white')
     # Default value for slider: bkg + thr = bkg + 6 sigma
-    thr_slider = widg.Slider(pad_slider, "Threshold", 0, np.max(pixels), valinit=background + threshold)
+    thr_slider = widg.Slider(pad_slider, "Threshold", 0, np.max(pixels), valinit=background + 6.0 * dispersion)
 
     event_handler(pads, pixels, thr_slider, dispersion)
 
