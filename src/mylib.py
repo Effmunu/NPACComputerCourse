@@ -111,7 +111,7 @@ def explore_cluster(pixels_visited, pixels, row, col, threshold):
                explore_cluster(pixels_visited, pixels, row, col+1, threshold) + \
                explore_cluster(pixels_visited, pixels, row-1, col, threshold)
 
-def find_clusters(header, pixels, threshold, search_radius=0.003):
+def find_clusters(header, pixels, threshold):
     """
     Find all the clusters in a FITS image, given a threshold
     :param header: header of the FITS image
@@ -122,7 +122,6 @@ def find_clusters(header, pixels, threshold, search_radius=0.003):
     # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
     cluster_list = []
-    cluster_dico = {}
         # access key : string with centroid x and y
         # value : doublet (the cluster, the cluster name (from Simbad request and sorting))
 
@@ -140,8 +139,17 @@ def find_clusters(header, pixels, threshold, search_radius=0.003):
                 # we don't give the name for now
                 pixels_visited[row, col] = 1 # visited
     # at this point, the cluster list is build
+    return cluster_list
 
-    # now build the dico
+def build_cluster_dico(cluster_list, search_radius=0.003):
+    """
+    Build a dictionary of clusters
+    :param header: header of the FITS image
+    :param pixels: original image matrix
+    :param threshold:
+    :return: dictionary of clusters: key = centroid coords, values = [cluster object, name]
+    """
+    cluster_dico = {}
     # we have to build it apart since tuple are non modifiable internally
     for cluster in cluster_list:
         celestial_objects = library.get_objects(cluster.centroid_wcs[0], \
@@ -160,7 +168,7 @@ def find_clusters(header, pixels, threshold, search_radius=0.003):
                 first_key = key
         cluster_dico['%f %f' % cluster.centroid] = (cluster, first_key)
 
-    return cluster_list, cluster_dico
+    return cluster_dico
 
 def find_max_integral_cluster(cluster_list):
     """

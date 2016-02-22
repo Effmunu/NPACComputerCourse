@@ -101,7 +101,8 @@ def main():
 
     # define an accetance radius around a given position to get the name from Simbad
     radius = 0.003
-    cluster_list, cluster_dico = mylib.find_clusters(header, pixels, threshold, radius)
+    cluster_list = mylib.find_clusters(header, pixels, threshold)
+    cluster_dico = mylib.build_cluster_dico(cluster_list, radius)
 
     # plot
     fig, pads = plt.subplots()

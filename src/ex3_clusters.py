@@ -36,7 +36,8 @@ def main():
     threshold = background + (6.0 * dispersion)
 
     # find the clusters.
-    cluster_list, cluster_dico = mylib.find_clusters(header, pixels, threshold)
+    cluster_list = mylib.find_clusters(header, pixels, threshold)
+    cluster_dico = mylib.build_cluster_dico(cluster_list)
 
     # find the maximum-integral cluster
     max_integral_key = mylib.find_max_integral_cluster(cluster_list)
