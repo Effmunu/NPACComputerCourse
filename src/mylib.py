@@ -111,7 +111,7 @@ def explore_cluster(pixels_visited, pixels, row, col, threshold):
                explore_cluster(pixels_visited, pixels, row, col+1, threshold) + \
                explore_cluster(pixels_visited, pixels, row-1, col, threshold)
 
-def find_clusters(header, pixels, threshold):
+def find_clusters(header, pixels, threshold, search_radius=0.003):
     """
     Find all the clusters in a FITS image, given a threshold
     :param header: header of the FITS image
@@ -123,6 +123,8 @@ def find_clusters(header, pixels, threshold):
     pixels_visited = np.zeros_like(pixels)
     cluster_list = []
     cluster_dico = {}
+        # access key : string with centroid x and y
+        # value : doublet (the cluster, the cluster name (from Simbad request and sorting))
 
     # WARNING : pixels[row, col]: row corresponds to x and col to y
     for row in range(len(pixels[0])):
@@ -131,12 +133,32 @@ def find_clusters(header, pixels, threshold):
                 continue # If pixel visited, go to next pixel (next step of the loop)
             if pixels[row, col] < threshold:
                 pixels_visited[row, col] = 1 # visited
-            else: # add the new cluster to the list and to the dictionary
+            else: # add the new cluster to the list
                 cluster = Cluster.Cluster(explore_cluster(
                     pixels_visited, pixels, row, col, threshold), pixels, header)
                 cluster_list.append(cluster)
-                cluster_dico['%f %f' % cluster.centroid] = cluster
+                # we don't give the name for now
                 pixels_visited[row, col] = 1 # visited
+    # at this point, the cluster list is build
+
+    # now build the dico
+    # we have to build it apart since tuple are non modifiable internally
+    for cluster in cluster_list:
+        celestial_objects = library.get_objects(cluster.centroid_wcs[0], \
+                                                cluster.centroid_wcs[1],
+                                                search_radius)
+        if not celestial_objects: # empty dictionary = False
+            cluster_dico['%f %f' % cluster.centroid] = (cluster, 'Not found')
+            continue
+        # now, there is at least one name available
+        # find the first name in alphabetical order, skipping the 'Unknown'
+        first_key = celestial_objects.keys()[0] # initialize
+        for key in celestial_objects.keys():
+            if celestial_objects[key] == 'Unknown':
+                continue
+            if key < first_key: # if before in alphabetic order
+                first_key = key
+        cluster_dico['%f %f' % cluster.centroid] = (cluster, first_key)
 
     return cluster_list, cluster_dico
 
@@ -158,7 +180,7 @@ def find_max_integral_cluster(cluster_list):
 ### For exercice 4
 ##########
 
-# TODO possible upgrade : also display the info 'on_click'
+# TODO possible upgrade : also display the info 'on_click'. Remove the last text on the screen
 
 def event_handler(fig, header, pixels):
     """
@@ -196,7 +218,7 @@ def event_handler(fig, header, pixels):
 # TODO : possible upgrade : only display the rectangle when the mouse is
 # over it, meaning we should connect to mpl in the event handler
 
-def event_handler2(fig, header, pixels, cluster_list, cluster_name_dico):
+def event_handler2(fig, header, pixels, cluster_list, cluster_dico):
     """
     Event handler
     :param fig: the canvas to draw into
@@ -232,7 +254,7 @@ def event_handler2(fig, header, pixels, cluster_list, cluster_name_dico):
         text_id = pads.text(event.xdata, event.ydata, "%f, %f \n%s"
                             % (my_wcs.convert_to_radec(event.xdata, event.ydata)[0],
                                my_wcs.convert_to_radec(event.xdata, event.ydata)[1],
-                               cluster_name_dico[centroid_to_query]),
+                               cluster_dico[centroid_to_query][1]),
                             fontsize=14, color='white')
         event.canvas.draw()
         text_id.remove()

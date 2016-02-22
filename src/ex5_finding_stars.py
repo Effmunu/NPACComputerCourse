@@ -37,19 +37,16 @@ def main():
     # creation of the histogram from the data
     bin_number = 200
     bin_values, bin_boundaries = np.histogram(pixels.ravel(), bin_number)
-    bin_lower_boundaries = bin_boundaries[:-1]
 
     # apply the fit (no need for the amplitude (first parameter))
-    _, background, dispersion = mylib.gaussian_fit(bin_lower_boundaries, bin_values)
+    _, background, dispersion = mylib.gaussian_fit(bin_boundaries[:-1], bin_values)
 
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
-    # find the clusters.
-    cluster_list, cluster_dico = mylib.find_clusters(header, pixels, threshold)
-
-    # find the maximum-integral cluster
-    max_integral_key = mylib.find_max_integral_cluster(cluster_list)
+    # define an accetance radius around a given position to get the name from Simbad
+    radius = 0.003
+    cluster_list, cluster_dico = mylib.find_clusters(header, pixels, threshold, radius)
 
     # plot
     fig, pads = plt.subplots()
@@ -63,41 +60,18 @@ def main():
                                          cluster.box_ymax - cluster.box_ymin,
                                          fill=False, color='white'))
 
-    # define an accetance radius around a given position
-    radius = 0.003
-    # Get the object name for each cluster.
-    # Also, find the max_integral object name
-    max_integral_object_name = ''
-    # I create a name dico, so that we won't have to query for them every time
-    cluster_name_dico = {}  # associate a centriod value (string) to the name
-    for cluster_key in cluster_dico.keys():
-        celestial_objects = library.get_objects(cluster_dico[cluster_key].centroid_wcs[0], \
-                                                cluster_dico[cluster_key].centroid_wcs[1],
-                                                radius)
-        if not celestial_objects: # empty dictionary = False
-            cluster_name_dico[cluster_key] = 'NO OBJECT FOUND'
-            continue
-        # now, there is at least one name available
-        # find the first name in alphabetical order, skipping the 'Unknown'
-        first_key = celestial_objects.keys()[0] # initialize
-        for key in celestial_objects.keys():
-            if celestial_objects[key] == 'Unknown':
-                continue
-            if key < first_key: # if before in alphabetic order
-                first_key = key
-        cluster_name_dico[cluster_key] = first_key
-        if cluster_key == max_integral_key: # If the current cluster is the max integral one
-            max_integral_object_name = first_key
+    # find the maximum-integral cluster
+    max_integral_key = mylib.find_max_integral_cluster(cluster_list)
 
     # call the event handler
-    mylib.event_handler2(fig, header, pixels, cluster_list, cluster_name_dico)
+    mylib.event_handler2(fig, header, pixels, cluster_list, cluster_dico)
 
     plt.show()
 
     # write result to output file
     try:
         with open(output_file_path, 'w') as output_file:
-            output_file.write('celestial object: %s' % max_integral_object_name)
+            output_file.write('celestial object: %s' % cluster_dico[max_integral_key][1])
 
     except IOError:
         print "File not found :", output_file_path

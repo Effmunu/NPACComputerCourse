@@ -47,9 +47,9 @@ def main():
             output_file.write('number of clusters: %2d, greatest integral: %7d, '
                               'centroid x: %4.1f, centroid y: %4.1f'
                               % (len(cluster_list),
-                                 cluster_dico[max_integral_key].integral,
-                                 cluster_dico[max_integral_key].centroid[0],
-                                 cluster_dico[max_integral_key].centroid[1]))
+                                 cluster_dico[max_integral_key][0].integral,
+                                 cluster_dico[max_integral_key][0].centroid[0],
+                                 cluster_dico[max_integral_key][0].centroid[1]))
 
     except IOError:
         print "File not found :", output_file_path

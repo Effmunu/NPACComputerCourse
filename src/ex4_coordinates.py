@@ -66,7 +66,7 @@ def main():
     try:
         with open(output_file_path, 'w') as output_file:
             output_file.write('right ascension: %.3f, declination: %.3f' \
-                              % (cluster_dico[max_integral_key].centroid_wcs))
+                              % (cluster_dico[max_integral_key][0].centroid_wcs))
 
     except IOError:
         print "File not found :", output_file_path
