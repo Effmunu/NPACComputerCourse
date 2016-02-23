@@ -50,6 +50,8 @@ class ClusterFactory(threading.Thread):
         with self.lock_pixels_visited:
             # if already tested
             if self.pixels_visited[row, col]:
+#####                if >thershold
+#####                    self.joined clusters.apend(num)
                 return []
             if self.pixels[row, col] < self.threshold:
                 self.pixels_visited[row, col] = 1  # this pixel has been tested
@@ -131,7 +133,8 @@ def main():
     cluster_list.sort()
     print cluster_list
 
-
+    # TODO: Add flag to pixels_visited: 'id' of thread that has visited it first.
+    # Add flag for termination of explore_cluster: 'out', 'done', 'below', '<id>' (id of another thread)
 
 
 
