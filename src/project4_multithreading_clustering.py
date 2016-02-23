@@ -4,9 +4,39 @@
 import sys
 import numpy as np
 import mylib
+import threading
 
 # pylint: disable=E1101
 # 'numpy' has indeed an 'histogram' member, this error is not relevant
+
+class ClusterFactory(threading.Thread):
+    """
+
+    """
+    def __init__(self):
+        """
+
+        :return:
+        """
+
+    def run(self):
+        """
+
+        :return:
+        """
+        ... = mylib.explore_cluster(...)
+
+class LockContext(threading.Lock):
+    """
+
+    """
+    def __init__(self):
+        """
+
+        :return:
+        """
+
+
 
 def main():
     """
@@ -28,7 +58,7 @@ def main():
     # We define the threshold at 6 standard deviations above the mean bkg value
     threshold = background + (6.0 * dispersion)
 
-
+    
 
 
 
