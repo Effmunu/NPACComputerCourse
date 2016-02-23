@@ -123,9 +123,9 @@ def find_clusters(header, pixels, threshold):
     pixels_visited = np.zeros_like(pixels)
     cluster_list = []
 
-    # WARNING : pixels[row, col]: row corresponds to x and col to y
-    for row in range(len(pixels[0])):
-        for col in range(len(pixels)):
+    # WARNING : pixels[row, col]: row corresponds to y and col to x
+    for row in range(len(pixels)):
+        for col in range(len(pixels[0])):
             if pixels_visited[row, col]:
                 continue # If pixel visited, go to next pixel (next step of the loop)
             if pixels[row, col] < threshold:
@@ -134,7 +134,6 @@ def find_clusters(header, pixels, threshold):
                 cluster = Cluster.Cluster(explore_cluster(
                     pixels_visited, pixels, row, col, threshold), pixels, header)
                 cluster_list.append(cluster)
-                # we don't give the name for now
                 pixels_visited[row, col] = 1 # visited
     # at this point, the cluster list is build
     return cluster_list
