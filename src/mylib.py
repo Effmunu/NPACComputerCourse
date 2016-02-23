@@ -122,8 +122,6 @@ def find_clusters(header, pixels, threshold):
     # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
     cluster_list = []
-        # access key : string with centroid x and y
-        # value : doublet (the cluster, the cluster name (from Simbad request and sorting))
 
     # WARNING : pixels[row, col]: row corresponds to x and col to y
     for row in range(len(pixels[0])):
@@ -150,6 +148,8 @@ def build_cluster_dico(cluster_list, search_radius=0.003):
     :return: dictionary of clusters: key = centroid coords, values = [cluster object, name]
     """
     cluster_dico = {}
+        # access key : string with centroid x and y
+        # value : doublet (the cluster, the cluster name (from Simbad request and sorting))
     # we have to build it apart since tuple are non modifiable internally
     for cluster in cluster_list:
         celestial_objects = library.get_objects(cluster.centroid_wcs[0], \
