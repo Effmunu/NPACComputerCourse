@@ -19,7 +19,7 @@ import mylib
 # pylint: disable=W0613
 # 'update' has to have 'event' as an argument
 
-def event_handler(pads, pixels, thresh_slider, dispersion):
+def event_handler(fig, pads, pixels, thresh_slider, dispersion):
     """
     Event handler
     :param pads: the pad to draw into
@@ -40,6 +40,7 @@ def event_handler(pads, pixels, thresh_slider, dispersion):
 #                            "%d sigma" % (thresh_slider.val / dispersion),
 #                            fontsize=14, color='white')
         pads.imshow(pixels * mask)
+        fig.canvas.draw()
 #        text_id.remove()
 
     thresh_slider.on_changed(update)
@@ -62,7 +63,7 @@ def main():
     _, background, dispersion = mylib.gaussian_fit(bin_boundaries[:-1], bin_values)
 
     # plot
-    _, pads = plt.subplots()
+    fig, pads = plt.subplots()
     # Add margins to gain space for the slider
     plt.subplots_adjust(left=0.25, bottom=0.25)
     pads.imshow(pixels)
@@ -71,7 +72,7 @@ def main():
     # Default value for slider: bkg + thr = bkg + 6 sigma
     thr_slider = widg.Slider(pad_slider, "Threshold", 0, np.max(pixels), valinit=background + 6.0 * dispersion)
 
-    event_handler(pads, pixels, thr_slider, dispersion)
+    event_handler(fig, pads, pixels, thr_slider, dispersion)
 
     # display
     plt.show()
