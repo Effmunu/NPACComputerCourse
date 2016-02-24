@@ -48,6 +48,9 @@ def event_handler(header, pixels, background, dispersion):
     # Maximal value: max value in 'pixels' - background
     thresh_slider = widg.Slider(pad_slider, "Threshold", 0,
                                 np.max(pixels) - background, valinit=0)
+    # Initialize the displayed text
+    pads.set_title("Pixels above background + %d sigma" \
+                  % (thresh_slider.val / dispersion))
 
     def update(event):
         """
@@ -65,8 +68,8 @@ def event_handler(header, pixels, background, dispersion):
         if not cluster_list: # If max recursion depth reached, cluster_list is empty
             nb_clusters = "Error: max recursion reached"
         else:
-            nb_clusters = "Number of cluster found : %i" % len(cluster_list)
-        plt.title("pixels above background + %d sigma. %s" \
+            nb_clusters = "Number of clusters found : %i" % len(cluster_list)
+        pads.set_title("Pixels above background + %d sigma. %s" \
                   % (thresh_slider.val / dispersion, nb_clusters))
         # Display the image with selected background removed
         # (we remove 'thresh_slider.val', with a threshold = 'thresh_slider.val - background'

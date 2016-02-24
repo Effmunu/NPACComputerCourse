@@ -45,6 +45,9 @@ def event_handler(pixels, background, dispersion):
     # Maximal value: max value in 'pixels' - background
     thresh_slider = widg.Slider(pad_slider, "Threshold", 0,
                                 np.max(pixels) - background, valinit=0)
+    # Initialize the displayed text
+    pads.set_title("pixels above background + %d sigma" \
+                  % (thresh_slider.val / dispersion))
 
     def update(event):
         """
@@ -55,7 +58,7 @@ def event_handler(pixels, background, dispersion):
         # clear the previous image
         pads.cla()
         # Display the number of sigmas above threshold selected with the slider
-        plt.title("pixels above background + %d sigma" \
+        pads.set_title("pixels above background + %d sigma" \
                   % (thresh_slider.val / dispersion))
         # Display the image with selected background removed
         # (we remove 'thresh_slider.val', with a threshold = 'thresh_slider.val - background'
