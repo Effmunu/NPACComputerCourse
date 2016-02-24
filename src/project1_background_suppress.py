@@ -22,9 +22,9 @@ import mylib
 def event_handler(pixels, background, dispersion):
     """
     Event handler
-    :param pads: the pad to draw into
     :param pixels: The image to display
-    :param thresh_slider: threshold slider
+    :param background: mean value of the image background
+    :param dispersion: dispersion of the background, fitted on the image
     :return:
     """
 
