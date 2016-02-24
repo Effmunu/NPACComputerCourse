@@ -19,11 +19,17 @@ import Cluster
 
 class ClusterFactory(threading.Thread):
     """
-
+    THread exploring pixels
     """
     def __init__(self, thr_id, lock_pixels_visited, pixels_visited, pixels, row, col, threshold):
         """
-
+        :param thr_id: thread identifier
+        :param lock_pixels_visited: the lock used
+        :param pixels_visited: boolean matrix of visited pixels (1 = visited)
+        :param pixels: original image matrix
+        :param row: seed
+        :param col: seed
+        :param threshold: detection threshold, usually "mean + 6*sigma"
         :return:
         """
         threading.Thread.__init__(self)
@@ -46,12 +52,8 @@ class ClusterFactory(threading.Thread):
         The image is assumed to be a matrix
         with first coordinate going from top to bottom
         and second coordinate going from right to left
-
-        :param pixels_visited: boolean matrix of visited pixels (1 = visited)
-        :param pixels: original image matrix
         :param row: x coordinate of the seed to begin the search
         :param col: y coordinate of the seed to begin the search
-        :param threshold: detection threshold, usually "mean + 6*sigma"
         :return: the list of pixels in the cluster
         """
 
@@ -89,17 +91,23 @@ class ClusterFactory(threading.Thread):
 
     def run(self):
         """
-
+        Actions to perform at thread start
         :return:
         """
         self.sub_cluster = self.explore_cluster(self.row, self.col)
 
 
 def find_cluster(header, pixels, threshold):
+    """
+    Find the clusters in 'pixels' image
+    :param header: header of the FITS file
+    :param pixels: image
+    :param threshold: as before
+    :return:
+    """
     # We define an array of pixels visited: -1 if not visited,
     # 0 if under threshold, <id> if visited by thread <id>
     pixels_visited = - np.ones_like(pixels)
-    cluster_list = []
     thread_list = []
     lock_pixels_visited = threading.RLock()
 
@@ -131,9 +139,12 @@ def merge_sub_clusters(thread_list, pixels, header):
     :param thread_list: list of threads launched by find_cluster
     :return: list of Cluster object of the image
     """
-    merged_pixel_list = [] # contains doublets (pixels list, corresponding tread id's merged in this list)
+    merged_pixel_list = []  # contains doublets
+                            # (pixels list, corresponding tread id's merged in this list)
 
     # .....
+    # pylint: disable=W0613
+    # 'thread_list' would be used here
 
     # create the cluster_list
     cluster_list = []
