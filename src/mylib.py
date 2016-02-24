@@ -133,10 +133,14 @@ def find_clusters(header, pixels, threshold):
             if pixels[row, col] < threshold:
                 pixels_visited[row, col] = 1 # visited
             else: # add the new cluster to the list
-                cluster = Cluster.Cluster(explore_cluster(
-                    pixels_visited, pixels, row, col, threshold), pixels, header)
-                cluster_list.append(cluster)
-                pixels_visited[row, col] = 1 # visited
+                try:
+                    cluster = Cluster.Cluster(explore_cluster(
+                        pixels_visited, pixels, row, col, threshold), pixels, header)
+                    cluster_list.append(cluster)
+                    pixels_visited[row, col] = 1 # visited
+                except RuntimeError: # If max recursion depth is reached, return an empty list
+                    print "Max recursion depth reached"
+                    return []
     # at this point, the cluster list is build
     return cluster_list
 
