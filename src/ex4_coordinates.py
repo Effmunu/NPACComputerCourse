@@ -38,17 +38,19 @@ def event_handler(fig, header, pixels):
         """
         Action on mouse movement.
         If outside the image, do not do anything.
+        Displays the WCS coordinates at the mouse pointer position
         :param event: the event
         :return:
         """
+        pads = event.inaxes     #event.inaxes returns the current pad
         if event.xdata >= len(pixels) or event.xdata < 0 \
                 or event.ydata >= len(pixels) or event.ydata < 0:
             return
-        pads = event.inaxes     #event.inaxes renvoie le pad courant
         text_id = pads.text(event.xdata, event.ydata,
                             "%f, %f" % my_wcs.convert_to_radec(event.xdata, event.ydata),
                             fontsize=14, color='white')
         event.canvas.draw()
+        # remove the text after drawing
         text_id.remove()
 
     fig.canvas.mpl_connect('motion_notify_event', move)

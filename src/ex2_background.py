@@ -37,7 +37,7 @@ def main():
 
     # visualization of the histogram and the fit
     _, pads = plt.subplots(1, 3)
-        # 1: image before bkg removal; # 2: image after bkg removal; 3: histogram and fit
+        # 0: image before bkg removal; # 1: image after bkg removal; 2: histogram and fit
     pads[2].plot(bin_lower_boundaries, bin_values, 'b+:', label='data')
     pads[2].plot(bin_lower_boundaries, \
                  mylib.gaussian(bin_lower_boundaries, maxvalue, background, dispersion), \

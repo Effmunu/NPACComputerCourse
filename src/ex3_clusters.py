@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Reads a FITS image
-Finding the clusters of pixels above a threshold in an FITS image, after background removal.
+Read a FITS image, then find the clusters of pixels above a threshold in an FITS image,
+after background removal.
 :Author: LAL npac09 <laudrain@ipno.in2p3.fr>
 :Date:   February 2016
 """

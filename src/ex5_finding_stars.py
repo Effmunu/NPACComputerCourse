@@ -5,7 +5,7 @@
 We read a FITS file, find the clusters,
 and convert their centroid coordinates to WCS coordinates.
 Then we display the celestial objects names on the image,
-following the mouse movement.
+at click on the corresponding object on the image.
 :Author: LAL npac09 <laudrain@ipno.in2p3.fr>
 :Date:   February 2016
 """
@@ -23,8 +23,6 @@ import mylib
 # pylint: disable=R0914
 # Only 19 local variables, and the code is already simple enough
 
-# TO-DO : possible upgrade : only display the rectangle when the mouse is
-# over it, meaning we should connect to mpl in the event handler
 def event_handler(fig, header, pixels, cluster_list, cluster_dico):
     """
     Event handler
@@ -43,20 +41,16 @@ def event_handler(fig, header, pixels, cluster_list, cluster_dico):
         :param event: the event
         :return:
         """
+        pads = event.inaxes     # get the current pad
         if event.xdata >= len(pixels) or event.xdata < 0 \
                 or event.ydata >= len(pixels) or event.ydata < 0:
             # if outside the image
             return
 
-        pads = event.inaxes     # get the current pad
-
         centroid_to_query = -1, -1
         for cluster in cluster_list:
-#            if (event.xdata, event.ydata) in cluster.pixel_list:
-            if event.xdata >= cluster.box_xmin and \
-                            event.xdata <= cluster.box_xmax and \
-                            event.ydata >= cluster.box_ymin and \
-                            event.ydata <= cluster.box_ymax:
+            if cluster.box_xmin <= event.xdata <= cluster.box_xmax and \
+                                    cluster.box_ymin <= event.ydata <= cluster.box_ymax:
                 centroid_to_query = '%f %f' % (cluster.centroid[0], cluster.centroid[1])
                 break   # found the cluster clicked on
         # if we didn't click on a cluster box, just redraw the picture
@@ -64,12 +58,14 @@ def event_handler(fig, header, pixels, cluster_list, cluster_dico):
             event.canvas.draw()
             return
 
+        # text to display on click
         text_id = pads.text(event.xdata, event.ydata, "%f, %f \n%s"
                             % (my_wcs.convert_to_radec(event.xdata, event.ydata)[0],
                                my_wcs.convert_to_radec(event.xdata, event.ydata)[1],
                                cluster_dico[centroid_to_query][1]),
                             fontsize=14, color='white')
         event.canvas.draw()
+        # remove the text after drawing
         text_id.remove()
 
     fig.canvas.mpl_connect('button_press_event', on_click)
@@ -80,7 +76,7 @@ def main():
     We read a FITS file, find the clusters,
     and convert their centroid coordinates to WCS coordinates.
     Then we display the celestial objects names on the image,
-    following the mouse movement.
+    at click on the corresponding object on the image.
     """
 
     input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
