@@ -39,7 +39,7 @@ def gaussian(x, amplitude, mean, sigma):
     :param amplitude: amplitude of the gaussian
     :param mean: mean of the gaussian
     :param sigma: dispersion of the gaussian
-    :return: value of a gaussian with the above parameters, at x
+    :return: value of a gaussian with the above parameters, at point x
     """
     return amplitude * np.exp(- (x - mean) * (x - mean) / (2 * sigma * sigma))
 
@@ -48,7 +48,7 @@ def gaussian_fit(xdata, ydata):
     Fit a set of data with a gaussian function.
     :param xdata: bin boundaries values (x values)
     :param ydata: bin contents (values) (y values)
-    :return:      The gaussian fit parameters: amplitude, background, dispersion
+    :return: The gaussian fit parameters: amplitude, background, dispersion
     """
 
     # normalization parameters
@@ -119,7 +119,7 @@ def find_clusters(header, pixels, threshold):
     :param header: header of the FITS image
     :param pixels: original image matrix
     :param threshold: threshold to be applied
-    :return: list of clusters in the image, dictionary of clusters indexed by centroid coordinates
+    :return: list of clusters in the image
     """
     # We define an array of pixels visited: 1 if visited, 0 elsewise
     pixels_visited = np.zeros_like(pixels)
@@ -146,7 +146,8 @@ def build_cluster_dico(cluster_list, search_radius=0.003):
     :param header: header of the FITS image
     :param pixels: original image matrix
     :param threshold: threshold to be applied
-    :return: dictionary of clusters: key = centroid coords, values = [cluster object, name]
+    :return: dictionary of clusters indexed by centroid coordinates:
+                key = centroid coords; values = [cluster object, name]
     """
     cluster_dico = {}
         # access key : string with centroid x and y
@@ -156,6 +157,7 @@ def build_cluster_dico(cluster_list, search_radius=0.003):
         celestial_objects = library.get_objects(cluster.centroid_wcs[0], \
                                                 cluster.centroid_wcs[1],
                                                 search_radius)
+        # if no object were found
         if not celestial_objects: # empty dictionary = False
             cluster_dico['%f %f' % cluster.centroid] = (cluster, 'Not found')
             continue
