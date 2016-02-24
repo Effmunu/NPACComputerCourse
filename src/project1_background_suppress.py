@@ -72,7 +72,7 @@ def main():
     Display the FITS image with a slider controlling the background level to be removed
     """
 
-    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/common.fits"
+    input_file_path = "/Users/npac09/PycharmProjects/npac09/data/specific.fits"
 
     # open file and retrieve data
     _, pixels = mylib.open_fits(input_file_path)
